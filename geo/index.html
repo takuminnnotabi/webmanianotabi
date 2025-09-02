@@ -76,7 +76,10 @@
 
     /* card / stamp overlay */
     #cardWrap{ position:relative; background: conic-gradient(from 180deg at 50% 120%, rgba(63,81,181,.06), transparent 70%) , #fafbff; }
-    #cardContainer{ position:relative; width:100%; max-width:560px; margin:16px auto 16px; padding:12px; }
+    #cardContainer{ position:relative; width:100%; max-width:560px; margin:16px auto 16px; padding:0; }
+    #card{ width:100%; display:block; border-radius:14px; box-shadow: var(--shadow); }
+    #overlay{ position:absolute; inset:0; pointer-events:none; border-radius:14px; }
+    #cardContainer .stamp{ position:absolute; width: var(--stamp-size, 72px); aspect-ratio:1/1; transform: translate(-50%, -50%) rotate(-8deg); opacity:.92; user-select:none; filter: drop-shadow(0 6px 10px rgba(0,0,0,.18)); transition: left .15s ease, top .15s ease; }
     #card{ width:100%; display:block; border-radius:14px; box-shadow: var(--shadow); }
     #cardContainer .stamp{ position:absolute; width: var(--stamp-size, 72px); aspect-ratio:1/1; transform: translate(-50%, -50%) rotate(-8deg); opacity:.92; pointer-events:none; user-select:none;
       filter: drop-shadow(0 6px 10px rgba(0,0,0,.18));
@@ -98,7 +101,7 @@
   <header>
     <div class="bar">
       <div class="brand" aria-label="スタンプラリー">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 22c4.418 0 8-3.582 8-8 0-3.69-2.5-6.79-5.87-7.72a4 4 0 10-4.26 0C6.5 7.21 4 10.31 4 14c0 4.418 3.582 8 8 8Z" fill="white"/></svg>
+        <img src="https://raw.githubusercontent.com/takuminnnotabi/ikegaminosite/refs/heads/main/geo/geo.png" alt="ロゴ" height="26" style="border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,.2)"/>
         スタンプラリー Pro
       </div>
       <div class="progress" aria-live="polite">
@@ -146,9 +149,8 @@
     <section class="card" id="cardWrap">
       <div class="cardHeader"><h2>スタンプカード</h2></div>
       <div id="cardContainer">
-        <!-- 画像は自由に変更可能（同じアスペクト比推奨） -->
         <img id="card" src="https://yohakuni.com/wp-content/uploads/2023/05/stampcard4-1.png" alt="スタンプラリーカード" />
-        <!-- スタンプはJSで重ねます -->
+        <div id="overlay" aria-hidden="true"></div>
       </div>
       <div class="toolbar" style="justify-content:space-between">
         <span class="muted" style="font-size:12px">※ 配置は端末に保存されます（localStorage）</span>
@@ -168,9 +170,16 @@
 
     // 地点データ（必要に応じて増やしてください）
     const locs = [
-      { id:'loc1', name:'竹田城跡',  lat:35.30000,   lng:134.82889, stamped:false },
-      { id:'loc2', name:'生野銀山',  lat:35.1716778, lng:134.81965, stamped:false },
-      { id:'loc3', name:'五色塚古墳', lat:34.62972,  lng:135.04556, stamped:false },
+      { id:'loc1', name:'豊岡市立歴史博物館（但馬国府・国分寺館）', lat:35.469695, lng:134.767431, stamped:false },
+      { id:'loc2', name:'祢布ヶ森遺跡公園（但馬国府推定地）', lat:35.470277, lng:134.769166, stamped:false },
+      { id:'loc3', name:'但馬国分寺跡（塔礎石など）', lat:35.471848, lng:134.773208, stamped:false },
+      { id:'loc4', name:'但馬国分尼寺跡（伝）', lat:35.4802722, lng:134.7760472, stamped:false },
+      { id:'loc5', name:'楯縫古墳', lat:35.4652694, lng:134.7968611, stamped:false },
+      { id:'loc6', name:'二見谷古墳群（1号墳付近）', lat:35.58731441, lng:134.79862478, stamped:false },
+      { id:'loc7', name:'森尾古墳跡', lat:35.520407, lng:134.868314, stamped:false },
+      { id:'loc8', name:'いずし古代学習館', lat:35.490563, lng:134.870377, stamped:false },
+      { id:'loc9', name:'茶臼山古墳', lat:35.461944, lng:134.884028, stamped:false },
+      { id:'loc10', name:'鶏塚古墳', lat:35.459833, lng:134.887222, stamped:false },
     ];
 
     // 状態
@@ -190,6 +199,7 @@
     const toastWrap  = document.getElementById('toast');
     const card       = document.getElementById('card');
     const cardContainer = document.getElementById('cardContainer');
+    const overlay    = document.getElementById('overlay');
 
     // 便利関数
     const fmtDist = (m) => m < 1000 ? `${Math.round(m)}m` : `${(m/1000).toFixed(2)}km`;
@@ -205,15 +215,17 @@
 
     // デフォルトのスロット（N個をきれいに並べる）
     function getDefaultSlots(n){
-      const cols = Math.min(3, Math.max(1, n));
+      const cols = Math.min(3, Math.max(1, Math.ceil(Math.sqrt(Math.min(n,9))))); // 1〜3列
       const rows = Math.ceil(n / cols);
-      const margin = .14; // 枠からの余白
-      const xs = cols === 1 ? [0.5] : cols === 2 ? [margin, 1-margin] : [margin, .5, 1-margin];
-      const ys = rows === 1 ? [0.5] : rows === 2 ? [0.35, 0.75] : [0.3, 0.55, 0.8];
+      const xs = cols === 1 ? [0.5] : (cols === 2 ? [0.33, 0.67] : [0.2, 0.5, 0.8]);
+      const ys = rows === 1 ? [0.5] : Array.from({length: rows}, (_, r) => 0.22 + (0.62 * (r/(rows-1))));
       const out = [];
       for(let i=0;i<n;i++){
         const c = i % cols; const r = Math.floor(i/cols);
         out.push({ x: xs[c], y: ys[r] ?? ys[ys.length-1] });
+      }
+      return out;
+    });
       }
       return out;
     }
@@ -246,12 +258,24 @@
     }
 
     function renderStamps(){
-      // 既存を掃除
-      cardContainer.querySelectorAll('.stamp').forEach(el => el.remove());
-      // 押印済みだけ追加
+      overlay.querySelectorAll('.stamp').forEach(el => el.remove());
       locs.forEach((l,i)=>{
         if(!l.stamped) return;
         const {x,y} = slotNorm[i] || {x:.5,y:.5};
+        const img = document.createElement('img');
+        img.src = STAMP_IMG;
+        img.alt = `${l.name} のスタンプ`;
+        img.className = 'stamp';
+        img.style.left = (x*100)+'%';
+        img.style.top  = (y*100)+'%';
+        img.animate([
+          { transform:'translate(-50%,-50%) scale(.6) rotate(-12deg)', opacity:.0 },
+          { transform:'translate(-50%,-50%) scale(1.15) rotate(-8deg)', opacity:.96, offset:.75 },
+          { transform:'translate(-50%,-50%) scale(1) rotate(-8deg)', opacity:.96 }
+        ],{ duration:420, easing:'cubic-bezier(.2,.8,.2,1)' });
+        overlay.appendChild(img);
+      });
+    } = slotNorm[i] || {x:.5,y:.5};
         const img = document.createElement('img');
         img.src = STAMP_IMG;
         img.alt = `${l.name} のスタンプ`;
@@ -269,14 +293,33 @@
     }
 
     function renderHandles(){
-      // 既存を掃除
-      cardContainer.querySelectorAll('.handle').forEach(el => el.remove());
+      overlay.querySelectorAll('.handle').forEach(el => el.remove());
       if(!handlesOn) return;
       slotNorm.forEach((p, idx)=>{
         const h = document.createElement('div');
         h.className = 'handle';
         h.style.left = (p.x*100)+'%'; h.style.top = (p.y*100)+'%';
         h.title = `#${idx+1} をドラッグで配置変更`;
+        let dragging = false;
+        const onMove = (e)=>{
+          if(!dragging) return;
+          const rect = card.getBoundingClientRect();
+          const cx = (e.touches? e.touches[0].clientX : e.clientX);
+          const cy = (e.touches? e.touches[0].clientY : e.clientY);
+          const x = clamp01((cx - rect.left)/rect.width);
+          const y = clamp01((cy - rect.top )/rect.height);
+          slotNorm[idx] = {x,y};
+          h.style.left = (x*100)+'%';
+          h.style.top  = (y*100)+'%';
+          renderStamps();
+        };
+        const onUp = ()=>{ dragging=false; window.removeEventListener('pointermove', onMove, {passive:false}); saveSlots(); };
+        h.addEventListener('pointerdown', (e)=>{ dragging=true; h.setPointerCapture(e.pointerId); });
+        window.addEventListener('pointermove', onMove, {passive:false});
+        window.addEventListener('pointerup', onUp, {once:true});
+        overlay.appendChild(h);
+      });
+    } をドラッグで配置変更`;
         let dragging = false;
         const onMove = (e)=>{
           if(!dragging) return;
@@ -437,6 +480,6 @@
   </script>
 
   <!-- ご自身の API キーに差し替えてください（HTTP リファラ制限を必ず設定） -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB04-heQzWfpUDS5ffARVYdtAr9_nV_dBE&callback=initMap"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap"></script>
 </body>
 </html>
