@@ -6,7 +6,7 @@
   <title>スタンプラリー – Pro</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root{
       --primary:#3f51b5;/* indigo */
@@ -25,7 +25,7 @@
     body{
       margin:0;
       background: radial-gradient(1200px 800px at 80% -200px, rgba(63,81,181,.12), transparent 60%) , var(--bg);
-      font-family: Inter, "Noto Sans JP", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      font-family: Inter, "Noto Sans JP", "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       color:var(--ink);
       letter-spacing:.02em;
     }
@@ -81,10 +81,6 @@
     #overlay{ position:absolute; inset:0; pointer-events:none; border-radius:14px; }
     #cardContainer .stamp{ position:absolute; width: var(--stamp-size, 72px); aspect-ratio:1/1; transform: translate(-50%, -50%) rotate(-8deg); opacity:.92; user-select:none; filter: drop-shadow(0 6px 10px rgba(0,0,0,.18)); transition: left .15s ease, top .15s ease; }
 
-    /* drag handles (edit mode) */
-    .handle{ position:absolute; transform: translate(-50%, -50%); width:34px; height:34px; border-radius:50%; border:2px dashed rgba(63,81,181,.6); background:rgba(99,102,241,.08); display:grid; place-items:center; cursor:grab; }
-    .handle:active{ cursor:grabbing; }
-
     /* toast */
     #toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%); display:grid; gap:8px; z-index:9999; }
     .toast{ background:#111827; color:#fff; padding:10px 14px; border-radius:12px; box-shadow: var(--shadow); font-weight:700; opacity:.98; }
@@ -134,10 +130,6 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="2"/><path d="M8 9h8" stroke="currentColor" stroke-width="2"/></svg>
           スタンプカードを表示/非表示
         </button>
-        <button class="btn primary" id="btnEdit">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m12 20 7-7-8-8-7 7v8h8Z" stroke="currentColor" stroke-width="2"/></svg>
-          配置を編集
-        </button>
       </div>
     </section>
 
@@ -149,13 +141,48 @@
         <div id="overlay" aria-hidden="true"></div>
       </div>
       <div class="toolbar" style="justify-content:space-between">
-        <span class="muted" style="font-size:12px">※ 配置は端末に保存されます（localStorage）</span>
+        <span class="muted" style="font-size:12px">※ 配置はカード画像の丸の中央に合わせた固定レイアウト（2×5）です</span>
         <div style="display:flex; gap:10px">
           <button class="btn" id="btnDefaultSlots">初期配置に戻す</button>
         </div>
       </div>
     </section>
   </main>
+
+  <!-- 完走セレブレーション & 賞状モーダル（日本語・認定番号/発行者/QRなし） -->
+  <div id="winModal" style="position:fixed;inset:0;display:none;place-items:center;background:rgba(17,24,39,.55);z-index:9998;">
+    <div style="width:min(900px,92vw);background:#fff;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.25);overflow:hidden">
+      <div style="padding:14px 16px;border-bottom:1px solid #eef0f6;display:flex;align-items:center;gap:10px">
+        <strong>全スポット達成！おめでとうございます 🎉</strong>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button class="btn" id="btnCloseWin">閉じる</button>
+        </div>
+      </div>
+      <div id="certWrap" style="padding:16px;background:#f6f7fb">
+        <style>
+          #certificate.jp { width:min(800px, 96%); margin: 10px auto; background-image:url('https://png.pngtree.com/png-vector/20221206/ourmid/pngtree-golden-blue-certificate-border-folio-f4-size-transparent-png-image_6514169.png'); background-size:cover; padding: 24px 24px 18px; box-shadow: 0 0 10px rgba(0,0,0,.08); position: relative; border-radius: 6px; font-family: 'Montserrat', 'Noto Sans JP', sans-serif; }
+          #certificate.jp h1 { text-align:center; color:#b80257; margin:.4em 0; }
+          #certificate.jp .field { margin: 10px 0 14px; }
+          #certificate.jp .field label { font-weight:700; color:#233142; font-size:14px; }
+          #certificate.jp .field input { width:100%; padding:10px 12px; border:1px solid #455d7a33; border-radius:8px; margin-top:6px; font-size:14px; }
+          #certificate.jp .btn { display:block; width:100%; padding:12px; background:#f95959; color:#fff; text-align:center; border:none; border-radius:10px; cursor:pointer; font-weight:800; }
+          #certificate.jp .btn:hover{ background:#b80257; }
+          #certificate.jp #seal { position:absolute; top:16px; right:16px; color:#b80257; font-size:32px; }
+          #certificate.jp small { color:#6b7280; display:block; margin-top:8px; text-align:center; }
+        </style>
+        <div id="certificate" class="jp">
+          <h1>賞状ジェネレーター</h1>
+          <div class="field">
+            <label for="participantJP">お名前（任意）:</label>
+            <input type="text" id="participantJP" placeholder="例）遺跡太郎 様">
+          </div>
+          <button class="btn" id="btnGenerateJP">賞状を保存</button>
+          <small>※ クリックすると別タブで賞状が開き、画像保存ボタンが使えます。</small>
+          <div id="seal"><i class="fas fa-award"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div id="toast" aria-live="polite"></div>
 
@@ -180,8 +207,6 @@
 
     // 状態
     let map, currentMarker, watchId = null, bounds;
-    let handlesOn = false; // 編集モード
-    let slotNorm = [];     // [ {x:0..1, y:0..1}, ... ]
 
     // DOM
     const countPill  = document.getElementById('countPill');
@@ -189,7 +214,6 @@
     const locList    = document.getElementById('locList');
     const btnReset   = document.getElementById('btnReset');
     const btnDemo    = document.getElementById('btnDemo');
-    const btnEdit    = document.getElementById('btnEdit');
     const btnToggleC = document.getElementById('btnToggleCard');
     const btnDefault = document.getElementById('btnDefaultSlots');
     const toastWrap  = document.getElementById('toast');
@@ -199,110 +223,56 @@
 
     // 便利関数
     const fmtDist = (m) => m < 1000 ? `${Math.round(m)}m` : `${(m/1000).toFixed(2)}km`;
-    const clamp01 = (v) => Math.min(1, Math.max(0, v));
-    const lsKey = (suffix) => `sr_v2_${suffix}`;
-    const getSlotsKey = () => lsKey('slots_'+(card?.src||'default'));
-    const getStampKey = () => lsKey('stamped');
 
     function toast(msg){
       const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg; toastWrap.appendChild(el);
       setTimeout(()=>{ el.style.opacity = '.0'; el.style.transform = 'translateY(6px)'; setTimeout(()=> el.remove(), 250); }, 1800);
     }
 
-    // デフォルトのスロット（10個を2×5で均等配置。その他の数もバランスよく並べる）
-    function getDefaultSlots(n){
-      let cols;
-      if(n <= 6){ cols = Math.min(3, Math.ceil(Math.sqrt(n))); }
-      else if(n <= 10){ cols = 5; }
-      else { cols = Math.min(5, Math.ceil(n/2)); }
-      const rows = Math.ceil(n / cols);
-      const marginX = 0.12, marginY = 0.22; // 枠からの余白
-      const spanX = (cols > 1) ? (1 - 2*marginX) / (cols - 1) : 0;
-      const spanY = (rows > 1) ? (0.62) / (rows - 1) : 0; // 0.22〜0.84の帯に配置
-      const xs = Array.from({length: cols}, (_, i) => cols === 1 ? 0.5 : (marginX + i*spanX));
-      const ys = Array.from({length: rows}, (_, r) => rows === 1 ? 0.5 : (marginY + r*spanY));
+    // 固定スロット（2行×5列）
+    function getFixedSlots(n){
+      const xs = [0.12, 0.30, 0.50, 0.70, 0.88];
+      const ys = [0.36, 0.73];
       const out = [];
       for(let i=0;i<n;i++){
-        const c = i % cols; const r = Math.floor(i/cols);
-        out.push({ x: xs[c] ?? xs[xs.length-1], y: ys[r] ?? ys[ys.length-1] });
+        const c = i % xs.length; const r = Math.floor(i / xs.length);
+        out.push({ x: xs[c] ?? 0.5, y: ys[r] ?? 0.5 });
       }
-      return out;
+      return out.slice(0, n);
     }
 
-    // スロットサイズをカード幅から算出（CSS変数へ反映）
     function updateStampSize(){
       const w = cardContainer.clientWidth;
-      const px = Math.max(48, Math.min(86, Math.round(w * 0.14))); // 48〜86px の範囲で自動
+      const px = Math.max(48, Math.min(86, Math.round(w * 0.14))); // 48〜86px
       cardContainer.style.setProperty('--stamp-size', px + 'px');
-    }
-
-    function saveSlots(){ localStorage.setItem(getSlotsKey(), JSON.stringify(slotNorm)); }
-    function loadSlots(){
-      try{
-        const s = JSON.parse(localStorage.getItem(getSlotsKey()) || 'null');
-        if(Array.isArray(s) && s.every(v => typeof v?.x==='number' && typeof v?.y==='number')) return s;
-      }catch{}
-      return getDefaultSlots(locs.length);
     }
 
     function saveStampState(){
       const m = {}; locs.forEach(l => m[l.id] = !!l.stamped);
-      localStorage.setItem(getStampKey(), JSON.stringify(m));
+      localStorage.setItem('sr_v2_stamped', JSON.stringify(m));
     }
     function loadStampState(){
       try{
-        const m = JSON.parse(localStorage.getItem(getStampKey())||'{}');
+        const m = JSON.parse(localStorage.getItem('sr_v2_stamped')||'{}');
         locs.forEach(l => l.stamped = !!m[l.id]);
       }catch{}
     }
 
     function renderStamps(){
       overlay.querySelectorAll('.stamp').forEach(el => el.remove());
+      const slots = getFixedSlots(locs.length);
       locs.forEach((l,i)=>{
         if(!l.stamped) return;
-        const {x,y} = slotNorm[i] || {x:.5,y:.5};
+        const {x,y} = slots[i] || {x:.5,y:.5};
         const img = document.createElement('img');
-        img.src = STAMP_IMG;
-        img.alt = `${l.name} のスタンプ`;
-        img.className = 'stamp';
-        img.style.left = (x*100)+'%';
-        img.style.top  = (y*100)+'%';
+        img.src = STAMP_IMG; img.alt = `${l.name} のスタンプ`; img.className = 'stamp';
+        img.style.left = (x*100)+'%'; img.style.top  = (y*100)+'%';
         img.animate([
           { transform:'translate(-50%,-50%) scale(.6) rotate(-12deg)', opacity:.0 },
           { transform:'translate(-50%,-50%) scale(1.15) rotate(-8deg)', opacity:.96, offset:.75 },
           { transform:'translate(-50%,-50%) scale(1) rotate(-8deg)', opacity:.96 }
         ],{ duration:420, easing:'cubic-bezier(.2,.8,.2,1)' });
         overlay.appendChild(img);
-      });
-    }
-
-    function renderHandles(){
-      overlay.querySelectorAll('.handle').forEach(el => el.remove());
-      overlay.style.pointerEvents = handlesOn ? 'auto' : 'none';
-      if(!handlesOn) return;
-      slotNorm.forEach((p, idx)=>{
-        const h = document.createElement('div');
-        h.className = 'handle';
-        h.style.left = (p.x*100)+'%'; h.style.top = (p.y*100)+'%';
-        h.title = `#${idx+1} をドラッグで配置変更`;
-        let dragging = false;
-        const onMove = (e)=>{
-          if(!dragging) return;
-          const rect = card.getBoundingClientRect();
-          const cx = (e.touches? e.touches[0].clientX : e.clientX);
-          const cy = (e.touches? e.touches[0].clientY : e.clientY);
-          const x = clamp01((cx - rect.left)/rect.width);
-          const y = clamp01((cy - rect.top )/rect.height);
-          slotNorm[idx] = {x,y};
-          h.style.left = (x*100)+'%';
-          h.style.top  = (y*100)+'%';
-          renderStamps();
-        };
-        const onUp = ()=>{ dragging=false; window.removeEventListener('pointermove', onMove, {passive:false}); saveSlots(); };
-        h.addEventListener('pointerdown', (e)=>{ dragging=true; h.setPointerCapture(e.pointerId); });
-        window.addEventListener('pointermove', onMove, {passive:false});
-        window.addEventListener('pointerup', onUp, {once:true});
-        overlay.appendChild(h);
       });
     }
 
@@ -344,11 +314,12 @@
       locs.forEach((l)=>{
         const d = distanceMeters(lat, lng, l.lat, l.lng);
         l.distance = d;
-        if(!l.stamped && d <= RADIUS_M){
-          l.stamped = true; updated = true; toast(`「${l.name}」に到着！スタンプを押しました。`);
-        }
+        if(!l.stamped && d <= RADIUS_M){ l.stamped = true; updated = true; toast(`「${l.name}」に到着！スタンプを押しました。`); }
       });
-      if(updated){ saveStampState(); renderStamps(); updateProgress(); renderList(); }
+      if(updated){
+        saveStampState(); renderStamps(); updateProgress(); renderList();
+        if(locs.every(x=>x.stamped)) celebrateAndShowCertificate();
+      }
     }
 
     function onPosition(pos){
@@ -369,7 +340,7 @@
       map.fitBounds(bounds);
     }
 
-    // Google Map 初期化（グローバルから呼ばれる）
+    // Google Map 初期化
     window.initMap = function(){
       map = new google.maps.Map(document.getElementById('map'), {
         zoom: 12, center: {lat:35.5, lng:134.83},
@@ -401,6 +372,7 @@
       }
 
       renderList();
+      if(locs.every(x=>x.stamped)) celebrateAndShowCertificate();
     };
 
     // UI イベント
@@ -414,34 +386,122 @@
     });
     btnDemo.addEventListener('click', ()=>{
       const next = locs.find(l => !l.stamped);
-      if(!next){ toast('すべて押印済みです！'); return; }
+      if(!next){ toast('すべて押印済みです！'); celebrateAndShowCertificate(); return; }
       next.stamped = true; saveStampState(); renderStamps(); updateProgress(); renderList(); toast(`デモ: 「${next.name}」を押印しました`);
+      if(locs.every(x=>x.stamped)) celebrateAndShowCertificate();
     });
     btnToggleC.addEventListener('click', ()=>{
       const wrap = document.getElementById('cardWrap');
       wrap.style.display = (getComputedStyle(wrap).display === 'none') ? 'block' : 'none';
     });
-    btnEdit.addEventListener('click', ()=>{
-      handlesOn = !handlesOn; renderHandles(); toast(handlesOn? '配置編集オン: ハンドルをドラッグして位置調整' : '配置編集オフ');
-      btnEdit.classList.toggle('primary', handlesOn);
-    });
     btnDefault.addEventListener('click', ()=>{
-      slotNorm = getDefaultSlots(locs.length); saveSlots(); renderHandles(); renderStamps(); toast('初期配置に戻しました');
+      renderStamps(); toast('初期配置に戻しました');
     });
 
-    // 初期化: 保存内容の読み込み
+    // 初期化
     loadStampState();
-    slotNorm = loadSlots();
+    renderStamps();
     updateProgress();
 
-    // カード画像ロード後にサイズ反映 & スタンプ描画
-    card.addEventListener('load', ()=>{ updateStampSize(); renderStamps(); renderHandles(); });
+    card.addEventListener('load', ()=>{ updateStampSize(); renderStamps(); });
     window.addEventListener('resize', updateStampSize);
 
   })();
   </script>
 
-  <!-- 指定のAPIキーで読み込み（HTTPリファラ制限を必ず設定） -->
+  <script>
+  function celebrateAndShowCertificate(){
+    if(window.confetti){
+      const shoot = () => {
+        confetti({ particleCount: 160, spread: 75, origin: { y: 0.6 } });
+        confetti({ particleCount: 120, angle: 60, spread: 65, origin: { x: 0 }, scalar: 0.9 });
+        confetti({ particleCount: 120, angle: 120, spread: 65, origin: { x: 1 }, scalar: 0.9 });
+      };
+      shoot(); setTimeout(shoot, 450); setTimeout(shoot, 1000);
+    }
+    document.getElementById('winModal').style.display = 'grid';
+  }
+  </script>
+
+  <script>
+  // 日本語版ジェネレーター（認定番号/発行者/QRなし + 保存ボタン付き別タブ）
+  function generateCertificateJP(){
+    const participantInput = document.getElementById('participantJP').value.trim();
+    const participant = participantInput || '参加者様';
+    const today = new Date().toLocaleDateString('ja-JP');
+
+    const certificateContent = `
+      <h1>賞状</h1>
+      <p style="text-align:center;color:#233142;">本状は、</p>
+      <h2 style=\"text-align:center;color:#b80257;\">${participant}</h2>
+      <p style="text-align:center;color:#233142;">が <strong style=\"color:#f95959;\">兵庫県豊岡市 考古学スタンプラリー</strong> を完走し、</p>
+      <h3 style="text-align:center;color:#b80257;">考古学マスターになりました</h3>
+      <p style="text-align:center;color:#233142;">ことをここに称します。</p>
+      <p style="text-align:center;color:#233142;">発行日：${today}</p>
+    `;
+
+    const w = window.open('', '_blank');
+    if(!w){ alert('ポップアップがブロックされました。ブラウザ設定で許可してください。'); return; }
+    w.document.open();
+    w.document.write(`
+      <html>
+      <head>
+        <meta charset=\"UTF-8\">
+        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+        <title>賞状</title>
+        <link href=\"https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap\" rel=\"stylesheet\">
+        <style>
+          body { font-family: 'Montserrat', sans-serif; background:#f5f6fb; margin:0; }
+          #tools { position:sticky; top:0; display:flex; gap:10px; justify-content:center; background:#fff; padding:10px; box-shadow:0 2px 10px rgba(0,0,0,.08); z-index:10; }
+          #tools button { border:1px solid #e6e9f4; background:#fff; padding:10px 12px; border-radius:10px; font-weight:800; cursor:pointer; }
+          #tools button.primary { background:#f95959; color:#fff; border-color:transparent; }
+          #certificate { width: 800px; margin: 20px auto; background-image: url('https://png.pngtree.com/png-vector/20221206/ourmid/pngtree-golden-blue-certificate-border-folio-f4-size-transparent-png-image_6514169.png'); background-size: cover; padding: 100px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); position: relative; }
+          #certificate h1, #certificate h2, #certificate h3 { text-align: center; color: #b80257; margin:.4em 0; }
+          #certificate p { text-align: center; color: #233142; margin:.35em 0; }
+          #certificate strong { color: #f95959; }
+          #seal { position: absolute; top: 20px; right: 20px; color: #b80257; font-size: 36px; }
+        </style>
+      </head>
+      <body>
+        <div id=\"tools\">
+          <button id=\"savePng\" class=\"primary\">画像として保存（PNG）</button>
+          <button id=\"print\">印刷</button>
+        </div>
+        <div id=\"certificate\">
+          <div id=\"seal\">★</div>
+          ${certificateContent}
+        </div>
+      </body>
+      </html>
+    `);
+    w.document.close();
+
+    // html2canvas を読み込んでからボタン動作を設定
+    const s = w.document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = function(){
+      w.document.getElementById('print').addEventListener('click', ()=> w.print());
+      w.document.getElementById('savePng').addEventListener('click', async ()=>{
+        const el = w.document.getElementById('certificate');
+        const canvas = await w.html2canvas(el, { scale: 2 });
+        const url = canvas.toDataURL('image/png');
+        const a = w.document.createElement('a'); a.href = url; a.download = 'certificate.png'; a.click();
+      });
+    };
+    w.document.body.appendChild(s);
+  }
+
+  // モーダル操作
+  document.addEventListener('click', (e)=>{
+    if(e.target && e.target.id === 'btnGenerateJP') generateCertificateJP();
+    if(e.target && e.target.id === 'btnCloseWin') document.getElementById('winModal').style.display = 'none';
+  });
+  </script>
+
+  <!-- ライブラリ（CDN）: confetti -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.min.js"></script>
+
+  <!-- Maps API（指定キー） -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB04-heQzWfpUDS5ffARVYdtAr9_nV_dBE&callback=initMap"></script>
 </body>
 </html>
