@@ -36,7 +36,7 @@
     }
     .bar{ max-width: 1100px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:14px; }
     .brand{ font-weight:800; font-size: clamp(18px, 3.5vw, 22px); letter-spacing:.04em; display:flex; align-items:center; gap:10px; }
-    .brand svg{ filter: drop-shadow(0 2px 4px rgba(0,0,0,.25)); }
+    .brand img{ height:26px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,.2); }
 
     /* progress */
     .progress{ margin-left:auto; display:flex; align-items:center; gap:12px; }
@@ -80,10 +80,6 @@
     #card{ width:100%; display:block; border-radius:14px; box-shadow: var(--shadow); }
     #overlay{ position:absolute; inset:0; pointer-events:none; border-radius:14px; }
     #cardContainer .stamp{ position:absolute; width: var(--stamp-size, 72px); aspect-ratio:1/1; transform: translate(-50%, -50%) rotate(-8deg); opacity:.92; user-select:none; filter: drop-shadow(0 6px 10px rgba(0,0,0,.18)); transition: left .15s ease, top .15s ease; }
-    #card{ width:100%; display:block; border-radius:14px; box-shadow: var(--shadow); }
-    #cardContainer .stamp{ position:absolute; width: var(--stamp-size, 72px); aspect-ratio:1/1; transform: translate(-50%, -50%) rotate(-8deg); opacity:.92; pointer-events:none; user-select:none;
-      filter: drop-shadow(0 6px 10px rgba(0,0,0,.18));
-      transition: left .15s ease, top .15s ease; }
 
     /* drag handles (edit mode) */
     .handle{ position:absolute; transform: translate(-50%, -50%); width:34px; height:34px; border-radius:50%; border:2px dashed rgba(63,81,181,.6); background:rgba(99,102,241,.08); display:grid; place-items:center; cursor:grab; }
@@ -101,7 +97,7 @@
   <header>
     <div class="bar">
       <div class="brand" aria-label="スタンプラリー">
-        <img src="https://raw.githubusercontent.com/takuminnnotabi/ikegaminosite/refs/heads/main/geo/geo.png" alt="ロゴ" height="26" style="border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,.2)"/>
+        <img src="https://raw.githubusercontent.com/takuminnnotabi/ikegaminosite/refs/heads/main/geo/geo.png" alt="ロゴ" />
         スタンプラリー Pro
       </div>
       <div class="progress" aria-live="polite">
@@ -168,18 +164,18 @@
     const STAMP_IMG = 'https://www.sozailab.jp/db_img/sozai/16330/1ac9f5dcab3a87cb7ba0a2363681ecaf.png';
     const RADIUS_M = 50; // 判定半径（m）
 
-    // 地点データ（必要に応じて増やしてください）
+    // 兵庫県豊岡市内の考古系スポット（10箇所・比較的近距離）
     const locs = [
       { id:'loc1', name:'豊岡市立歴史博物館（但馬国府・国分寺館）', lat:35.469695, lng:134.767431, stamped:false },
-      { id:'loc2', name:'祢布ヶ森遺跡公園（但馬国府推定地）', lat:35.470277, lng:134.769166, stamped:false },
-      { id:'loc3', name:'但馬国分寺跡（塔礎石など）', lat:35.471848, lng:134.773208, stamped:false },
-      { id:'loc4', name:'但馬国分尼寺跡（伝）', lat:35.4802722, lng:134.7760472, stamped:false },
-      { id:'loc5', name:'楯縫古墳', lat:35.4652694, lng:134.7968611, stamped:false },
-      { id:'loc6', name:'二見谷古墳群（1号墳付近）', lat:35.58731441, lng:134.79862478, stamped:false },
-      { id:'loc7', name:'森尾古墳跡', lat:35.520407, lng:134.868314, stamped:false },
-      { id:'loc8', name:'いずし古代学習館', lat:35.490563, lng:134.870377, stamped:false },
-      { id:'loc9', name:'茶臼山古墳', lat:35.461944, lng:134.884028, stamped:false },
-      { id:'loc10', name:'鶏塚古墳', lat:35.459833, lng:134.887222, stamped:false },
+      { id:'loc2', name:'祢布ヶ森遺跡公園（但馬国府推定地）',       lat:35.470277, lng:134.769166, stamped:false },
+      { id:'loc3', name:'但馬国分寺跡（塔礎石など）',                 lat:35.471848, lng:134.773208, stamped:false },
+      { id:'loc4', name:'但馬国分尼寺跡（伝）',                       lat:35.4802722, lng:134.7760472, stamped:false },
+      { id:'loc5', name:'楯縫古墳',                                   lat:35.4652694, lng:134.7968611, stamped:false },
+      { id:'loc6', name:'二見谷古墳群（1号墳付近）',                 lat:35.58731441, lng:134.79862478, stamped:false },
+      { id:'loc7', name:'森尾古墳跡',                                 lat:35.520407, lng:134.868314, stamped:false },
+      { id:'loc8', name:'いずし古代学習館',                           lat:35.490563, lng:134.870377, stamped:false },
+      { id:'loc9', name:'茶臼山古墳',                                 lat:35.461944, lng:134.884028, stamped:false },
+      { id:'loc10', name:'鶏塚古墳',                                   lat:35.459833, lng:134.887222, stamped:false },
     ];
 
     // 状態
@@ -213,19 +209,22 @@
       setTimeout(()=>{ el.style.opacity = '.0'; el.style.transform = 'translateY(6px)'; setTimeout(()=> el.remove(), 250); }, 1800);
     }
 
-    // デフォルトのスロット（N個をきれいに並べる）
+    // デフォルトのスロット（10個を2×5で均等配置。その他の数もバランスよく並べる）
     function getDefaultSlots(n){
-      const cols = Math.min(3, Math.max(1, Math.ceil(Math.sqrt(Math.min(n,9))))); // 1〜3列
+      let cols;
+      if(n <= 6){ cols = Math.min(3, Math.ceil(Math.sqrt(n))); }
+      else if(n <= 10){ cols = 5; }
+      else { cols = Math.min(5, Math.ceil(n/2)); }
       const rows = Math.ceil(n / cols);
-      const xs = cols === 1 ? [0.5] : (cols === 2 ? [0.33, 0.67] : [0.2, 0.5, 0.8]);
-      const ys = rows === 1 ? [0.5] : Array.from({length: rows}, (_, r) => 0.22 + (0.62 * (r/(rows-1))));
+      const marginX = 0.12, marginY = 0.22; // 枠からの余白
+      const spanX = (cols > 1) ? (1 - 2*marginX) / (cols - 1) : 0;
+      const spanY = (rows > 1) ? (0.62) / (rows - 1) : 0; // 0.22〜0.84の帯に配置
+      const xs = Array.from({length: cols}, (_, i) => cols === 1 ? 0.5 : (marginX + i*spanX));
+      const ys = Array.from({length: rows}, (_, r) => rows === 1 ? 0.5 : (marginY + r*spanY));
       const out = [];
       for(let i=0;i<n;i++){
         const c = i % cols; const r = Math.floor(i/cols);
-        out.push({ x: xs[c], y: ys[r] ?? ys[ys.length-1] });
-      }
-      return out;
-    });
+        out.push({ x: xs[c] ?? xs[xs.length-1], y: ys[r] ?? ys[ys.length-1] });
       }
       return out;
     }
@@ -275,25 +274,11 @@
         ],{ duration:420, easing:'cubic-bezier(.2,.8,.2,1)' });
         overlay.appendChild(img);
       });
-    } = slotNorm[i] || {x:.5,y:.5};
-        const img = document.createElement('img');
-        img.src = STAMP_IMG;
-        img.alt = `${l.name} のスタンプ`;
-        img.className = 'stamp';
-        img.style.left = (x*100)+'%';
-        img.style.top  = (y*100)+'%';
-        // ぽよん演出
-        img.animate([
-          { transform:'translate(-50%,-50%) scale(.6) rotate(-12deg)', opacity:.0 },
-          { transform:'translate(-50%,-50%) scale(1.15) rotate(-8deg)', opacity:.96, offset:.75 },
-          { transform:'translate(-50%,-50%) scale(1) rotate(-8deg)', opacity:.96 }
-        ],{ duration:420, easing:'cubic-bezier(.2,.8,.2,1)' });
-        cardContainer.appendChild(img);
-      });
     }
 
     function renderHandles(){
       overlay.querySelectorAll('.handle').forEach(el => el.remove());
+      overlay.style.pointerEvents = handlesOn ? 'auto' : 'none';
       if(!handlesOn) return;
       slotNorm.forEach((p, idx)=>{
         const h = document.createElement('div');
@@ -318,27 +303,6 @@
         window.addEventListener('pointermove', onMove, {passive:false});
         window.addEventListener('pointerup', onUp, {once:true});
         overlay.appendChild(h);
-      });
-    } をドラッグで配置変更`;
-        let dragging = false;
-        const onMove = (e)=>{
-          if(!dragging) return;
-          const rect = card.getBoundingClientRect();
-          const cx = (e.touches? e.touches[0].clientX : e.clientX);
-          const cy = (e.touches? e.touches[0].clientY : e.clientY);
-          const x = clamp01((cx - rect.left)/rect.width);
-          const y = clamp01((cy - rect.top )/rect.height);
-          slotNorm[idx] = {x,y};
-          h.style.left = (x*100)+'%';
-          h.style.top  = (y*100)+'%';
-          // 押印済みのスタンプも追従
-          renderStamps();
-        };
-        const onUp = ()=>{ dragging=false; window.removeEventListener('pointermove', onMove, {passive:false}); saveSlots(); };
-        h.addEventListener('pointerdown', (e)=>{ dragging=true; h.setPointerCapture(e.pointerId); });
-        window.addEventListener('pointermove', onMove, {passive:false});
-        window.addEventListener('pointerup', onUp, {once:true});
-        cardContainer.appendChild(h);
       });
     }
 
@@ -377,7 +341,7 @@
 
     function tryStampByPosition(lat, lng){
       let updated = false;
-      locs.forEach((l, i)=>{
+      locs.forEach((l)=>{
         const d = distanceMeters(lat, lng, l.lat, l.lng);
         l.distance = d;
         if(!l.stamped && d <= RADIUS_M){
@@ -399,7 +363,6 @@
     function onGeoError(err){ toast('位置情報エラー: '+ err.message); if(watchId) navigator.geolocation.clearWatch(watchId); }
 
     function fitAll(){
-      if(!bounds){ bounds = new google.maps.LatLngBounds(); }
       bounds = new google.maps.LatLngBounds();
       locs.forEach(l => bounds.extend({lat:l.lat, lng:l.lng}));
       if(currentMarker) bounds.extend(currentMarker.getPosition());
@@ -409,7 +372,7 @@
     // Google Map 初期化（グローバルから呼ばれる）
     window.initMap = function(){
       map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 12, center: {lat:35.3, lng:134.82},
+        zoom: 12, center: {lat:35.5, lng:134.83},
         disableDefaultUI: true,
         styles: [
           { elementType:'geometry', stylers:[{color:'#f5f5f5'}]},
@@ -437,7 +400,6 @@
         watchId = navigator.geolocation.watchPosition(onPosition, onGeoError, { enableHighAccuracy:true, maximumAge:0, timeout: 15000 });
       }
 
-      // 初回距離表示用（現在地がまだ無い場合は概算不可）
       renderList();
     };
 
@@ -479,7 +441,7 @@
   })();
   </script>
 
-  <!-- ご自身の API キーに差し替えてください（HTTP リファラ制限を必ず設定） -->
+  <!-- 指定のAPIキーで読み込み（HTTPリファラ制限を必ず設定） -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB04-heQzWfpUDS5ffARVYdtAr9_nV_dBE&callback=initMap"></script>
 </body>
 </html>
