@@ -1,218 +1,442 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>スタンプラリー</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>スタンプラリー – Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary: #3f51b5;
-      --secondary: #ff4081;
-      --bg: #fafafa;
-      --card-bg: #fff;
-      --shadow: rgba(0, 0, 0, 0.1);
-      --radius: 8px;
+    :root{
+      --primary:#3f51b5;/* indigo */
+      --primary-600:#3949ab;
+      --secondary:#ff4081;/* pink */
+      --bg:#f6f7fb;
+      --card-bg:#ffffff;
+      --ink:#24292f;
+      --muted:#6b7280;
+      --radius:14px;
+      --shadow:0 10px 30px rgba(0,0,0,.08);
+      --ring: 0 0 0 3px rgba(63,81,181,.18);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      font-family: "Helvetica Neue", Arial, sans-serif;
-      color: #333;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
+    * { box-sizing: border-box; }
+    html, body { height:100%; }
+    body{
+      margin:0;
+      background: radial-gradient(1200px 800px at 80% -200px, rgba(63,81,181,.12), transparent 60%) , var(--bg);
+      font-family: Inter, "Noto Sans JP", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color:var(--ink);
+      letter-spacing:.02em;
     }
-    header {
-      background: var(--primary);
-      color: #fff;
-      padding: 12px 16px;
-      text-align: center;
-      font-size: 1.2rem;
-      box-shadow: 0 2px 4px var(--shadow);
+    header{
+      position: sticky; top:0; z-index:10;
+      background: linear-gradient(135deg, var(--primary), #5c6bc0);
+      color:#fff; box-shadow: var(--shadow);
     }
-    #controls {
-      display: flex;
-      gap: 8px;
-      padding: 12px 16px;
-      background: var(--card-bg);
-      box-shadow: 0 2px 4px var(--shadow);
-      border-radius: var(--radius);
-      margin: 12px;
-    }
-    #controls button {
-      background: var(--secondary);
-      border: none;
-      color: #fff;
-      padding: 10px 16px;
-      font-size: 1rem;
-      border-radius: var(--radius);
-      box-shadow: 0 2px 4px var(--shadow);
-      transition: background 0.2s;
-      cursor: pointer;
-    }
-    #controls button:hover { background: #e91e63; }
-    main {
-      flex: 1;
-      display: grid;
-      grid-template-rows: 30vh auto;
-    }
-    #map {
-      width: 100%;
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    section {
-      padding: 12px 16px;
-      overflow-y: auto;
-    }
-    .location-item {
-      background: var(--card-bg);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      padding: 10px 12px;
-      border-radius: var(--radius);
-      box-shadow: 0 1px 3px var(--shadow);
-    }
-    .location-item span { font-size: 0.9rem; }
-    .location-item .stamp-btn {
-      background: var(--primary);
-      padding: 6px 12px;
-      font-size: 0.9rem;
-      border-radius: var(--radius);
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    .location-item .stamp-btn:disabled { opacity: 0.5; cursor: default; }
-    #card-container {
-      position: relative;
-      width: 90%;
-      max-width: 400px;
-      margin: 12px auto;
-      display: none;
-    }
-    #card {
-      width: 100%;
-      border-radius: var(--radius);
-      box-shadow: 0 2px 4px var(--shadow);
-    }
-    .stamp {
-      position: absolute;
-      width: 15%;
-      max-width: 60px;
-      transform: translate(-50%, -50%);
-      opacity: 0.85;
-      pointer-events: none;
-    }
+    .bar{ max-width: 1100px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:14px; }
+    .brand{ font-weight:800; font-size: clamp(18px, 3.5vw, 22px); letter-spacing:.04em; display:flex; align-items:center; gap:10px; }
+    .brand svg{ filter: drop-shadow(0 2px 4px rgba(0,0,0,.25)); }
+
+    /* progress */
+    .progress{ margin-left:auto; display:flex; align-items:center; gap:12px; }
+    .pill{ background:rgba(255,255,255,.15); padding:6px 10px; border-radius:999px; font-weight:700; font-size:13px; }
+    .meter{ position:relative; width:140px; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden; }
+    .meter>span{ position:absolute; inset:0 100% 0 0; background: #fff; opacity:.9; transition: inset .3s ease; }
+
+    main{ max-width:1100px; margin:18px auto; padding:0 16px; display:grid; gap:16px; grid-template-columns: 1.2fr .8fr; }
+    @media (max-width: 900px){ main{ grid-template-columns: 1fr; } }
+
+    /* cards */
+    .card{ background:var(--card-bg); border-radius:var(--radius); box-shadow: var(--shadow); overflow:hidden; }
+    .cardHeader{ padding:12px 14px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #eef0f6; }
+    .cardHeader h2{ margin:0; font-size:15px; font-weight:700; color:#111827; }
+
+    /* map */
+    #map{ height: clamp(320px, 34vh, 460px); width:100%; }
+    .mapTools{ position:absolute; right:14px; top:14px; display:flex; flex-direction:column; gap:8px; }
+    .fab{ background:#fff; border:none; box-shadow: var(--shadow); width:44px; height:44px; border-radius:12px; display:grid; place-items:center; cursor:pointer; transition: transform .08s ease; }
+    .fab:active{ transform: translateY(1px); }
+
+    /* locations */
+    .list{ padding:10px; display:flex; flex-direction:column; gap:10px; }
+    .loc{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px; border:1px solid #eef0f6; border-radius:12px; }
+    .loc h3{ margin:0 0 4px; font-size:15px; }
+    .loc .muted{ color:var(--muted); font-size:12px; }
+    .loc .right{ display:flex; align-items:center; gap:8px; }
+    .badge{ font-size:11px; background:#eef2ff; color:#3f51b5; padding:4px 8px; border-radius:999px; font-weight:700; }
+    .stampState{ font-weight:700; font-size:12px; color:#10b981; }
+    .disabled{ opacity:.6; }
+
+    /* toolbar */
+    .toolbar{ display:flex; flex-wrap:wrap; gap:10px; padding:12px; border-top:1px solid #eef0f6; background:#fbfcff; }
+    .btn{ border:1px solid #e6e9f4; background:#fff; color:#111827; padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:700; display:flex; align-items:center; gap:8px; }
+    .btn.primary{ border-color: transparent; background:linear-gradient(135deg, var(--secondary), #ff5b93); color:#fff; box-shadow: var(--ring); }
+    .btn:active{ transform: translateY(1px); }
+
+    /* card / stamp overlay */
+    #cardWrap{ position:relative; background: conic-gradient(from 180deg at 50% 120%, rgba(63,81,181,.06), transparent 70%) , #fafbff; }
+    #cardContainer{ position:relative; width:100%; max-width:560px; margin:16px auto 16px; padding:12px; }
+    #card{ width:100%; display:block; border-radius:14px; box-shadow: var(--shadow); }
+    #cardContainer .stamp{ position:absolute; width: var(--stamp-size, 72px); aspect-ratio:1/1; transform: translate(-50%, -50%) rotate(-8deg); opacity:.92; pointer-events:none; user-select:none;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.18));
+      transition: left .15s ease, top .15s ease; }
+
+    /* drag handles (edit mode) */
+    .handle{ position:absolute; transform: translate(-50%, -50%); width:34px; height:34px; border-radius:50%; border:2px dashed rgba(63,81,181,.6); background:rgba(99,102,241,.08); display:grid; place-items:center; cursor:grab; }
+    .handle:active{ cursor:grabbing; }
+
+    /* toast */
+    #toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%); display:grid; gap:8px; z-index:9999; }
+    .toast{ background:#111827; color:#fff; padding:10px 14px; border-radius:12px; box-shadow: var(--shadow); font-weight:700; opacity:.98; }
+
+    /* small helpers */
+    .sr{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
   </style>
 </head>
 <body>
-  <header>スタンプラリー</header>
+  <header>
+    <div class="bar">
+      <div class="brand" aria-label="スタンプラリー">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 22c4.418 0 8-3.582 8-8 0-3.69-2.5-6.79-5.87-7.72a4 4 0 10-4.26 0C6.5 7.21 4 10.31 4 14c0 4.418 3.582 8 8 8Z" fill="white"/></svg>
+        スタンプラリー Pro
+      </div>
+      <div class="progress" aria-live="polite">
+        <span class="pill" id="countPill">0/0</span>
+        <div class="meter" aria-hidden="true"><span id="meterFill"></span></div>
+      </div>
+    </div>
+  </header>
+
   <main>
-    <div id="map"></div>
-    <section id="locations"></section>
+    <!-- Map card -->
+    <section class="card" style="position:relative">
+      <div class="cardHeader"><h2>現在地とスポット</h2></div>
+      <div id="map"></div>
+      <div class="mapTools" aria-hidden="true">
+        <button class="fab" id="btnLocate" title="現在地に移動">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2v2m0 16v2m8-10h2M2 12H4m14.95-6.95-1.41 1.41M6.46 17.54l-1.41 1.41M17.54 17.54l1.41 1.41M6.46 6.46 5.05 5.05" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button class="fab" id="btnFit" title="全体表示">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="list" id="locList"></div>
+      <div class="toolbar">
+        <button class="btn" id="btnReset">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4v6h6M20 20v-6h-6M20 9A8 8 0 1 0 7.76 4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          リセット
+        </button>
+        <button class="btn" id="btnDemo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          デモ押印
+        </button>
+        <button class="btn" id="btnToggleCard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="2"/><path d="M8 9h8" stroke="currentColor" stroke-width="2"/></svg>
+          スタンプカードを表示/非表示
+        </button>
+        <button class="btn primary" id="btnEdit">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m12 20 7-7-8-8-7 7v8h8Z" stroke="currentColor" stroke-width="2"/></svg>
+          配置を編集
+        </button>
+      </div>
+    </section>
+
+    <!-- Stamp card -->
+    <section class="card" id="cardWrap">
+      <div class="cardHeader"><h2>スタンプカード</h2></div>
+      <div id="cardContainer">
+        <!-- 画像は自由に変更可能（同じアスペクト比推奨） -->
+        <img id="card" src="https://yohakuni.com/wp-content/uploads/2023/05/stampcard4-1.png" alt="スタンプラリーカード" />
+        <!-- スタンプはJSで重ねます -->
+      </div>
+      <div class="toolbar" style="justify-content:space-between">
+        <span class="muted" style="font-size:12px">※ 配置は端末に保存されます（localStorage）</span>
+        <div style="display:flex; gap:10px">
+          <button class="btn" id="btnDefaultSlots">初期配置に戻す</button>
+        </div>
+      </div>
+    </section>
   </main>
-  <div id="card-container">
-    <img id="card" src="https://yohakuni.com/wp-content/uploads/2023/05/stampcard4-1.png" alt="スタンプラリーカード">
-  </div>
+
+  <div id="toast" aria-live="polite"></div>
+
   <script>
-    // 自動登録ロケーション
-    const locs = [
-      { id: 'loc1', name: '竹田城跡', lat: 35.30000, lng: 134.82889, stamped: false },
-      { id: 'loc2', name: '生野銀山', lat: 35.1716778, lng: 134.81965, stamped: false },
-      { id: 'loc3', name: '五色塚古墳', lat: 34.62972, lng: 135.04556, stamped: false }
-    ];
-    const RADIUS = 50;
-    const positions = [
-      { x: '20%', y: '20%' }, { x: '50%', y: '20%' }, { x: '80%', y: '20%' }
-    ];
+  ;(() => {
     const STAMP_IMG = 'https://www.sozailab.jp/db_img/sozai/16330/1ac9f5dcab3a87cb7ba0a2363681ecaf.png';
+    const RADIUS_M = 50; // 判定半径（m）
 
-    let map, currentMarker, watchId;
+    // 地点データ（必要に応じて増やしてください）
+    const locs = [
+      { id:'loc1', name:'竹田城跡',  lat:35.30000,   lng:134.82889, stamped:false },
+      { id:'loc2', name:'生野銀山',  lat:35.1716778, lng:134.81965, stamped:false },
+      { id:'loc3', name:'五色塚古墳', lat:34.62972,  lng:135.04556, stamped:false },
+    ];
 
-    function initMap() {
-      if (!window.isSecureContext) {
-        alert('HTTPS または localhost で実行してください。');
+    // 状態
+    let map, currentMarker, watchId = null, bounds;
+    let handlesOn = false; // 編集モード
+    let slotNorm = [];     // [ {x:0..1, y:0..1}, ... ]
+
+    // DOM
+    const countPill  = document.getElementById('countPill');
+    const meterFill  = document.getElementById('meterFill');
+    const locList    = document.getElementById('locList');
+    const btnReset   = document.getElementById('btnReset');
+    const btnDemo    = document.getElementById('btnDemo');
+    const btnEdit    = document.getElementById('btnEdit');
+    const btnToggleC = document.getElementById('btnToggleCard');
+    const btnDefault = document.getElementById('btnDefaultSlots');
+    const toastWrap  = document.getElementById('toast');
+    const card       = document.getElementById('card');
+    const cardContainer = document.getElementById('cardContainer');
+
+    // 便利関数
+    const fmtDist = (m) => m < 1000 ? `${Math.round(m)}m` : `${(m/1000).toFixed(2)}km`;
+    const clamp01 = (v) => Math.min(1, Math.max(0, v));
+    const lsKey = (suffix) => `sr_v2_${suffix}`;
+    const getSlotsKey = () => lsKey('slots_'+(card?.src||'default'));
+    const getStampKey = () => lsKey('stamped');
+
+    function toast(msg){
+      const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg; toastWrap.appendChild(el);
+      setTimeout(()=>{ el.style.opacity = '.0'; el.style.transform = 'translateY(6px)'; setTimeout(()=> el.remove(), 250); }, 1800);
+    }
+
+    // デフォルトのスロット（N個をきれいに並べる）
+    function getDefaultSlots(n){
+      const cols = Math.min(3, Math.max(1, n));
+      const rows = Math.ceil(n / cols);
+      const margin = .14; // 枠からの余白
+      const xs = cols === 1 ? [0.5] : cols === 2 ? [margin, 1-margin] : [margin, .5, 1-margin];
+      const ys = rows === 1 ? [0.5] : rows === 2 ? [0.35, 0.75] : [0.3, 0.55, 0.8];
+      const out = [];
+      for(let i=0;i<n;i++){
+        const c = i % cols; const r = Math.floor(i/cols);
+        out.push({ x: xs[c], y: ys[r] ?? ys[ys.length-1] });
       }
-      map = new google.maps.Map(document.getElementById('map'), { zoom: 15, center: { lat: 35.3, lng: 134.82 } });
-      // マーカー配置
-      locs.forEach(l => {
-        l.marker = new google.maps.Marker({ position: { lat: l.lat, lng: l.lng }, map: map, title: l.name });
+      return out;
+    }
+
+    // スロットサイズをカード幅から算出（CSS変数へ反映）
+    function updateStampSize(){
+      const w = cardContainer.clientWidth;
+      const px = Math.max(48, Math.min(86, Math.round(w * 0.14))); // 48〜86px の範囲で自動
+      cardContainer.style.setProperty('--stamp-size', px + 'px');
+    }
+
+    function saveSlots(){ localStorage.setItem(getSlotsKey(), JSON.stringify(slotNorm)); }
+    function loadSlots(){
+      try{
+        const s = JSON.parse(localStorage.getItem(getSlotsKey()) || 'null');
+        if(Array.isArray(s) && s.every(v => typeof v?.x==='number' && typeof v?.y==='number')) return s;
+      }catch{}
+      return getDefaultSlots(locs.length);
+    }
+
+    function saveStampState(){
+      const m = {}; locs.forEach(l => m[l.id] = !!l.stamped);
+      localStorage.setItem(getStampKey(), JSON.stringify(m));
+    }
+    function loadStampState(){
+      try{
+        const m = JSON.parse(localStorage.getItem(getStampKey())||'{}');
+        locs.forEach(l => l.stamped = !!m[l.id]);
+      }catch{}
+    }
+
+    function renderStamps(){
+      // 既存を掃除
+      cardContainer.querySelectorAll('.stamp').forEach(el => el.remove());
+      // 押印済みだけ追加
+      locs.forEach((l,i)=>{
+        if(!l.stamped) return;
+        const {x,y} = slotNorm[i] || {x:.5,y:.5};
+        const img = document.createElement('img');
+        img.src = STAMP_IMG;
+        img.alt = `${l.name} のスタンプ`;
+        img.className = 'stamp';
+        img.style.left = (x*100)+'%';
+        img.style.top  = (y*100)+'%';
+        // ぽよん演出
+        img.animate([
+          { transform:'translate(-50%,-50%) scale(.6) rotate(-12deg)', opacity:.0 },
+          { transform:'translate(-50%,-50%) scale(1.15) rotate(-8deg)', opacity:.96, offset:.75 },
+          { transform:'translate(-50%,-50%) scale(1) rotate(-8deg)', opacity:.96 }
+        ],{ duration:420, easing:'cubic-bezier(.2,.8,.2,1)' });
+        cardContainer.appendChild(img);
       });
-      // 位置情報監視
-      if (navigator.geolocation) {
-        watchId = navigator.geolocation.watchPosition(onPosition, onError, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
-      } else {
-        alert('位置情報を取得できません。');
+    }
+
+    function renderHandles(){
+      // 既存を掃除
+      cardContainer.querySelectorAll('.handle').forEach(el => el.remove());
+      if(!handlesOn) return;
+      slotNorm.forEach((p, idx)=>{
+        const h = document.createElement('div');
+        h.className = 'handle';
+        h.style.left = (p.x*100)+'%'; h.style.top = (p.y*100)+'%';
+        h.title = `#${idx+1} をドラッグで配置変更`;
+        let dragging = false;
+        const onMove = (e)=>{
+          if(!dragging) return;
+          const rect = card.getBoundingClientRect();
+          const cx = (e.touches? e.touches[0].clientX : e.clientX);
+          const cy = (e.touches? e.touches[0].clientY : e.clientY);
+          const x = clamp01((cx - rect.left)/rect.width);
+          const y = clamp01((cy - rect.top )/rect.height);
+          slotNorm[idx] = {x,y};
+          h.style.left = (x*100)+'%';
+          h.style.top  = (y*100)+'%';
+          // 押印済みのスタンプも追従
+          renderStamps();
+        };
+        const onUp = ()=>{ dragging=false; window.removeEventListener('pointermove', onMove, {passive:false}); saveSlots(); };
+        h.addEventListener('pointerdown', (e)=>{ dragging=true; h.setPointerCapture(e.pointerId); });
+        window.addEventListener('pointermove', onMove, {passive:false});
+        window.addEventListener('pointerup', onUp, {once:true});
+        cardContainer.appendChild(h);
+      });
+    }
+
+    function updateProgress(){
+      const total = locs.length; const got = locs.filter(l=>l.stamped).length;
+      countPill.textContent = `${got}/${total}`;
+      const pct = Math.round((got/Math.max(1,total))*100);
+      meterFill.style.inset = `0 ${100-pct}% 0 0`;
+    }
+
+    function renderList(){
+      locList.innerHTML = '';
+      locs.forEach((l)=>{
+        const row = document.createElement('div'); row.className = 'loc';
+        const left = document.createElement('div');
+        const h3 = document.createElement('h3'); h3.textContent = l.name; left.appendChild(h3);
+        const sub = document.createElement('div'); sub.className = 'muted';
+        const dTxt = l.distance != null ? `距離: ${fmtDist(l.distance)}` : '距離: 取得中…';
+        sub.textContent = (l.stamped? '✅ 押印済み' : 'スタンプ未取得') + ' ・ ' + dTxt;
+        left.appendChild(sub);
+        const right = document.createElement('div'); right.className = 'right';
+        const badge = document.createElement('span'); badge.className = 'badge'; badge.textContent = RADIUS_M + 'm 圏内で押印';
+        right.appendChild(badge);
+        if(l.stamped){ const ss = document.createElement('span'); ss.className='stampState'; ss.textContent='Complete'; right.appendChild(ss); row.classList.add('disabled'); }
+        row.append(left, right);
+        locList.appendChild(row);
+      });
+    }
+
+    function distanceMeters(lat1, lon1, lat2, lon2){
+      const R = 6371000; const toRad = deg => deg * Math.PI/180;
+      const dLat = toRad(lat2-lat1), dLon = toRad(lon2-lon1);
+      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    function tryStampByPosition(lat, lng){
+      let updated = false;
+      locs.forEach((l, i)=>{
+        const d = distanceMeters(lat, lng, l.lat, l.lng);
+        l.distance = d;
+        if(!l.stamped && d <= RADIUS_M){
+          l.stamped = true; updated = true; toast(`「${l.name}」に到着！スタンプを押しました。`);
+        }
+      });
+      if(updated){ saveStampState(); renderStamps(); updateProgress(); renderList(); }
+    }
+
+    function onPosition(pos){
+      const { latitude, longitude } = pos.coords;
+      const p = { lat: latitude, lng: longitude };
+      if(!currentMarker){
+        currentMarker = new google.maps.Marker({ position: p, map, icon:{ path: google.maps.SymbolPath.CIRCLE, scale: 6, fillColor:'#3f51b5', fillOpacity:.7, strokeWeight:2 } });
+      }else{ currentMarker.setPosition(p); }
+      tryStampByPosition(latitude, longitude);
+    }
+
+    function onGeoError(err){ toast('位置情報エラー: '+ err.message); if(watchId) navigator.geolocation.clearWatch(watchId); }
+
+    function fitAll(){
+      if(!bounds){ bounds = new google.maps.LatLngBounds(); }
+      bounds = new google.maps.LatLngBounds();
+      locs.forEach(l => bounds.extend({lat:l.lat, lng:l.lng}));
+      if(currentMarker) bounds.extend(currentMarker.getPosition());
+      map.fitBounds(bounds);
+    }
+
+    // Google Map 初期化（グローバルから呼ばれる）
+    window.initMap = function(){
+      map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12, center: {lat:35.3, lng:134.82},
+        disableDefaultUI: true,
+        styles: [
+          { elementType:'geometry', stylers:[{color:'#f5f5f5'}]},
+          { elementType:'labels.icon', stylers:[{visibility:'off'}]},
+          { elementType:'labels.text.fill', stylers:[{color:'#616161'}]},
+          { elementType:'labels.text.stroke', stylers:[{color:'#f5f5f5'}]},
+          { featureType:'administrative.land_parcel', elementType:'labels', stylers:[{visibility:'off'}]},
+          { featureType:'poi', elementType:'labels.text', stylers:[{visibility:'off'}]},
+          { featureType:'poi.park', elementType:'geometry', stylers:[{color:'#e5f2e8'}]},
+          { featureType:'road', elementType:'geometry', stylers:[{color:'#ffffff'}]},
+          { featureType:'road', elementType:'labels.icon', stylers:[{visibility:'off'}]},
+          { featureType:'water', elementType:'geometry', stylers:[{color:'#d2e7fb'}]}
+        ]
+      });
+
+      // スポット
+      locs.forEach(l => { l.marker = new google.maps.Marker({ position:{lat:l.lat, lng:l.lng}, map, title:l.name }); });
+      fitAll();
+
+      // 位置監視
+      if(location.protocol !== 'https:' && location.hostname !== 'localhost'){
+        toast('HTTPSで開くと自動押印が有効になります');
       }
+      if(navigator.geolocation){
+        watchId = navigator.geolocation.watchPosition(onPosition, onGeoError, { enableHighAccuracy:true, maximumAge:0, timeout: 15000 });
+      }
+
+      // 初回距離表示用（現在地がまだ無い場合は概算不可）
       renderList();
-    }
+    };
 
-    function onPosition(pos) {
-      const coords = pos.coords;
-      const p = { lat: coords.latitude, lng: coords.longitude };
-      if (!currentMarker) {
-        currentMarker = new google.maps.Marker({ position: p, map: map, icon: { path: google.maps.SymbolPath.CIRCLE, scale: 6, fillColor: '#3f51b5', fillOpacity: 0.6, strokeWeight: 2 } });
-      } else {
-        currentMarker.setPosition(p);
-      }
-      locs.forEach((l, i) => {
-        if (!l.stamped) {
-          const d = distance(coords.latitude, coords.longitude, l.lat, l.lng);
-          if (d <= RADIUS) {
-            l.stamped = true;
-            renderList();
-            renderStamps();
-            document.getElementById('card-container').style.display = 'block';
-            alert(`${l.name} に到着しました！スタンプを押しました。`);
-          }
-        }
-      });
-    }
+    // UI イベント
+    document.getElementById('btnLocate').addEventListener('click', ()=>{
+      if(currentMarker){ map.panTo(currentMarker.getPosition()); map.setZoom(15); } else toast('現在地がまだ取得できていません');
+    });
+    document.getElementById('btnFit').addEventListener('click', fitAll);
 
-    function onError(err) {
-      alert('位置情報取得エラー: ' + err.message);
-      if (watchId) navigator.geolocation.clearWatch(watchId);
-    }
+    btnReset.addEventListener('click', ()=>{
+      locs.forEach(l => l.stamped=false); saveStampState(); renderStamps(); updateProgress(); renderList(); toast('リセットしました');
+    });
+    btnDemo.addEventListener('click', ()=>{
+      const next = locs.find(l => !l.stamped);
+      if(!next){ toast('すべて押印済みです！'); return; }
+      next.stamped = true; saveStampState(); renderStamps(); updateProgress(); renderList(); toast(`デモ: 「${next.name}」を押印しました`);
+    });
+    btnToggleC.addEventListener('click', ()=>{
+      const wrap = document.getElementById('cardWrap');
+      wrap.style.display = (getComputedStyle(wrap).display === 'none') ? 'block' : 'none';
+    });
+    btnEdit.addEventListener('click', ()=>{
+      handlesOn = !handlesOn; renderHandles(); toast(handlesOn? '配置編集オン: ハンドルをドラッグして位置調整' : '配置編集オフ');
+      btnEdit.classList.toggle('primary', handlesOn);
+    });
+    btnDefault.addEventListener('click', ()=>{
+      slotNorm = getDefaultSlots(locs.length); saveSlots(); renderHandles(); renderStamps(); toast('初期配置に戻しました');
+    });
 
-    function renderList() {
-      const c = document.getElementById('locations'); c.innerHTML = '';
-      locs.forEach((l, i) => {
-        const d = document.createElement('div'); d.className = 'location-item';
-        const name = document.createElement('span'); name.textContent = l.name;
-        const btn = document.createElement('button'); btn.className = 'stamp-btn';
-        btn.textContent = l.stamped ? '✅ 押印済み' : 'スタンプ待ち'; btn.disabled = true;
-        d.append(name, btn); c.appendChild(d);
-      });
-    }
+    // 初期化: 保存内容の読み込み
+    loadStampState();
+    slotNorm = loadSlots();
+    updateProgress();
 
-    function renderStamps() {
-      const container = document.getElementById('card-container');
-      // 既存スタンプ削除
-      container.querySelectorAll('.stamp').forEach(e => e.remove());
-      locs.forEach((l, i) => {
-        if (l.stamped) {
-          const img = document.createElement('img');
-          img.src = STAMP_IMG; img.className = 'stamp';
-          img.style.left = positions[i].x; img.style.top = positions[i].y;
-          container.appendChild(img);
-        }
-      });
-    }
+    // カード画像ロード後にサイズ反映 & スタンプ描画
+    card.addEventListener('load', ()=>{ updateStampSize(); renderStamps(); renderHandles(); });
+    window.addEventListener('resize', updateStampSize);
 
-    function distance(lat1, lon1, lat2, lon2) {
-      const R = 6371000;
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2)**2;
-      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
-
-    window.initMap = initMap;
+  })();
   </script>
+
+  <!-- ご自身の API キーに差し替えてください（HTTP リファラ制限を必ず設定） -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB04-heQzWfpUDS5ffARVYdtAr9_nV_dBE&callback=initMap"></script>
 </body>
 </html>
