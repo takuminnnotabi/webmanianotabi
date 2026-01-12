@@ -14,24 +14,41 @@
             --primary-yellow: #c8e038;
             --dark-bg: #3d3d3d;
             --darker-bg: #2d2d2d;
+            --danger: #e74c3c;
         }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        body {
+        html, body {
             font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
         }
         
-        /* Editor Container */
+        /* Fullscreen */
+        body.fullscreen-mode { background: var(--dark-bg) !important; overflow: hidden !important; }
+        body.fullscreen-mode .editor-container { display: none !important; }
+        body.fullscreen-mode .fullscreen-board-container { display: flex !important; }
+        
+        .fullscreen-board-container {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: var(--dark-bg);
+            z-index: 9999;
+        }
+        
+        .fullscreen-board {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            background: var(--dark-bg);
+        }
+        
+        /* Editor */
         .editor-container {
             padding: 20px;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         
@@ -67,23 +84,42 @@
             font-weight: 700;
             cursor: pointer;
             font-family: inherit;
-            box-shadow: 0 4px 15px rgba(0,177,64,0.4);
-            transition: all 0.3s;
         }
         
-        .fullscreen-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,177,64,0.5);
-        }
-        
-        /* Editor Panel */
-        .editor-panel {
-            background: rgba(255,255,255,0.98);
-            border-radius: 16px;
-            padding: 25px;
+        /* Tabs */
+        .main-tabs {
+            display: flex;
+            gap: 5px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .main-tab {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+        }
+        
+        .main-tab.active {
+            background: rgba(255,255,255,0.98);
+            color: #333;
+        }
+        
+        .tab-content {
+            display: none;
+            background: rgba(255,255,255,0.98);
+            border-radius: 0 12px 12px 12px;
+            padding: 25px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
+        
+        .tab-content.active { display: block; }
         
         .section-title {
             font-size: 16px;
@@ -92,9 +128,6 @@
             margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 2px solid #eee;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
         
         .editor-grid {
@@ -122,19 +155,14 @@
             border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
-            transition: all 0.2s;
         }
         
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none;
             border-color: var(--primary-green);
-            box-shadow: 0 0 0 3px rgba(0,177,64,0.1);
         }
         
-        .form-group textarea {
-            resize: vertical;
-            min-height: 60px;
-        }
+        .form-group textarea { resize: vertical; min-height: 60px; }
         
         /* Day Tabs */
         .day-tabs {
@@ -153,46 +181,50 @@
             font-size: 14px;
             font-weight: 700;
             font-family: inherit;
-            transition: all 0.2s;
         }
         
-        .day-tab.active {
-            background: var(--primary-orange);
-            color: #000;
+        .day-tab.active { background: var(--primary-orange); color: #000; }
+        
+        /* Schedule Type Tabs */
+        .schedule-type-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
         
-        .day-tab:hover:not(.active) {
-            background: #d8d8d8;
+        .schedule-type-tab {
+            padding: 8px 16px;
+            background: #d0d0d0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
         }
+        
+        .schedule-type-tab.active { background: var(--primary-green); color: #fff; }
         
         /* Period List */
-        .period-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .period-list { display: flex; flex-direction: column; gap: 8px; }
         
         .period-item {
             display: grid;
-            grid-template-columns: 100px 80px 80px 1fr 1fr 40px;
-            gap: 10px;
+            grid-template-columns: 90px 75px 75px 1fr 1fr 36px;
+            gap: 8px;
             align-items: center;
-            padding: 12px;
+            padding: 10px;
             background: #f8f8f8;
             border-radius: 8px;
         }
         
         .period-item input {
-            padding: 8px 10px;
+            padding: 8px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 13px;
             font-family: inherit;
-        }
-        
-        .period-item input:focus {
-            outline: none;
-            border-color: var(--primary-green);
         }
         
         .period-item .label-input {
@@ -202,32 +234,17 @@
             color: #000;
         }
         
-        .period-item .time-input {
-            text-align: center;
-        }
-        
         .delete-btn {
-            width: 32px;
-            height: 32px;
-            border: none;
-            border-radius: 50%;
-            background: #e74c3c;
+            width: 30px; height: 30px;
+            border: none; border-radius: 50%;
+            background: var(--danger);
             color: #fff;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
         }
         
-        .delete-btn:hover {
-            background: #c0392b;
-            transform: scale(1.1);
-        }
-        
-        .add-period-btn {
-            padding: 12px 24px;
+        .add-btn {
+            padding: 10px 20px;
             background: var(--primary-green);
             color: #fff;
             border: none;
@@ -237,11 +254,30 @@
             cursor: pointer;
             font-family: inherit;
             margin-top: 10px;
-            transition: all 0.2s;
         }
         
-        .add-period-btn:hover {
-            background: #009935;
+        /* Holiday List */
+        .holiday-item {
+            display: grid;
+            grid-template-columns: auto 120px 120px 1fr 36px;
+            gap: 10px;
+            align-items: center;
+            padding: 12px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .holiday-item input[type="checkbox"] {
+            width: 20px; height: 20px;
+        }
+        
+        .holiday-item input[type="date"],
+        .holiday-item input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
         }
         
         /* Button Row */
@@ -260,25 +296,21 @@
             font-weight: 700;
             cursor: pointer;
             font-family: inherit;
-            transition: all 0.2s;
         }
         
         .btn-save { background: var(--primary-green); color: #fff; }
         .btn-load { background: var(--primary-orange); color: #000; }
-        .btn-reset { background: #e74c3c; color: #fff; }
+        .btn-reset { background: var(--danger); color: #fff; }
         
-        .btn:hover { transform: translateY(-2px); }
-        
-        /* Preview */
         .preview-label {
             color: #fff;
             font-size: 14px;
-            margin-bottom: 10px;
+            margin: 20px 0 10px;
             opacity: 0.7;
         }
         
-        /* ===== DISPLAY BOARD ===== */
-        .board {
+        /* Board Preview */
+        .board-preview {
             width: 100%;
             max-width: 1100px;
             margin: 0 auto;
@@ -288,20 +320,7 @@
             box-shadow: 0 15px 50px rgba(0,0,0,0.5);
         }
         
-        /* Fullscreen styles */
-        .board:fullscreen {
-            border-radius: 0;
-            max-width: none;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .board:-webkit-full-screen {
-            border-radius: 0;
-            max-width: none;
-        }
-        
-        /* Header */
+        /* ===== BOARD STYLES ===== */
         .board-header {
             display: flex;
             align-items: center;
@@ -353,15 +372,15 @@
             font-weight: 700;
             padding: 8px 20px;
             border-radius: 6px;
-            font-family: 'Consolas', 'M PLUS Rounded 1c', monospace;
+            font-family: 'Consolas', monospace;
             min-width: 110px;
             text-align: center;
         }
         
         .class-badge {
             display: flex;
-            align-items: baseline;
-            gap: 4px;
+            flex-direction: column;
+            align-items: center;
         }
         
         .class-number-box {
@@ -380,8 +399,9 @@
         
         .class-unit {
             color: #fff;
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 700;
+            margin-top: 2px;
         }
         
         /* Main Display */
@@ -389,6 +409,7 @@
             display: flex;
             background: var(--darker-bg);
             border-top: 3px solid #555;
+            min-height: 150px;
         }
         
         .day-section {
@@ -424,8 +445,7 @@
         }
         
         .period-indicator {
-            width: 85px;
-            height: 85px;
+            width: 85px; height: 85px;
             border: 6px solid var(--primary-green);
             border-radius: 50%;
             display: flex;
@@ -446,26 +466,61 @@
             font-size: 80px;
             font-weight: 900;
             letter-spacing: 0.03em;
-            animation: pulse 2s ease-in-out infinite;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.85; }
+        /* Break Timer */
+        .break-timer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .break-timer-label {
+            color: #aaa;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .break-timer {
+            color: #fff;
+            font-size: 100px;
+            font-weight: 900;
+            font-family: 'Consolas', monospace;
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+        
+        .break-timer.urgent {
+            color: #ff6b6b;
+            animation: timerPulse 0.5s ease-in-out infinite;
+        }
+        
+        @keyframes timerPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .break-next-subject {
+            color: #aaa;
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 15px;
         }
         
         /* Schedule Grid */
         .schedule-grid-section {
             background: #fff;
             padding: 18px 25px 8px;
-            overflow-x: auto;
         }
         
         .schedule-grid {
             display: flex;
             gap: 8px;
             text-align: center;
-            min-width: fit-content;
         }
         
         .schedule-item {
@@ -481,7 +536,7 @@
         
         .schedule-item.hr-slot {
             min-width: 55px;
-            flex: 0;
+            flex: 0 0 55px;
         }
         
         .schedule-item .subject-char {
@@ -491,52 +546,46 @@
             line-height: 1.15;
         }
         
-        .schedule-item.hr-slot .subject-char {
-            font-size: 24px;
-        }
+        .schedule-item.hr-slot .subject-char { font-size: 24px; }
         
         /* Timeline */
         .timeline-section {
             background: #fff;
             padding: 5px 25px 12px;
-            overflow-x: auto;
         }
         
         .timeline {
             display: flex;
             gap: 8px;
             position: relative;
-            min-width: fit-content;
+            align-items: center;
+            height: 50px;
         }
         
         .timeline-track {
             position: absolute;
-            top: 50%;
-            left: 28px;
-            right: 28px;
+            top: 50%; left: 28px; right: 28px;
             height: 14px;
             background: var(--primary-orange);
             transform: translateY(-50%);
             border-radius: 7px;
             z-index: 0;
+            overflow: hidden;
         }
         
         .progress-fill {
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             height: 100%;
             background: linear-gradient(90deg, var(--primary-green) 0%, #00d050 100%);
             border-radius: 7px;
             transition: width 1s ease;
-            box-shadow: 0 0 10px rgba(0,177,64,0.5);
         }
         
         .timeline-marker {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 45px;
             min-width: 70px;
             flex: 1;
             position: relative;
@@ -545,25 +594,20 @@
         
         .timeline-marker.hr-slot {
             min-width: 55px;
-            flex: 0;
+            flex: 0 0 55px;
         }
         
         .timeline-dot {
-            width: 28px;
-            height: 28px;
+            width: 28px; height: 28px;
             background: #fff;
             border: 5px solid var(--primary-green);
             border-radius: 50%;
-            transition: all 0.5s ease;
         }
         
-        .timeline-dot.filled {
-            background: var(--primary-green);
-        }
+        .timeline-dot.filled { background: var(--primary-green); }
         
         .period-circle {
-            min-width: 38px;
-            height: 38px;
+            min-width: 38px; height: 38px;
             padding: 0 8px;
             background: #fff;
             border: 3px solid #333;
@@ -573,8 +617,6 @@
             justify-content: center;
             font-size: 18px;
             font-weight: 800;
-            color: #000;
-            transition: all 0.5s ease;
         }
         
         .period-circle.active {
@@ -582,7 +624,6 @@
             color: #fff;
             border-color: var(--primary-green);
             transform: scale(1.15);
-            box-shadow: 0 0 15px rgba(0,177,64,0.5);
         }
         
         .period-circle.passed {
@@ -591,17 +632,10 @@
             border-color: var(--primary-green);
         }
         
-        .hour-label {
-            font-size: 16px;
-            color: var(--primary-orange);
-            font-weight: 800;
-        }
-        
         /* Room Info */
         .room-info-section {
             background: #fff;
             padding: 5px 25px 18px;
-            overflow-x: auto;
         }
         
         .room-grid {
@@ -610,7 +644,6 @@
             font-size: 12px;
             font-weight: 500;
             color: #555;
-            min-width: fit-content;
         }
         
         .room-grid span {
@@ -621,7 +654,43 @@
         
         .room-grid span.hr-slot {
             min-width: 55px;
-            flex: 0;
+            flex: 0 0 55px;
+        }
+        
+        /* Announcement Ticker */
+        .announcement-section {
+            background: #222;
+            padding: 12px 25px;
+            overflow: hidden;
+        }
+        
+        .announcement-ticker {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .announcement-label {
+            background: var(--danger);
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .announcement-text {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            white-space: nowrap;
+            animation: ticker 20s linear infinite;
+        }
+        
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
         }
         
         /* Footer */
@@ -638,12 +707,8 @@
             font-weight: 600;
         }
         
-        /* End of day display */
-        .end-of-day-display {
-            display: none;
-        }
-        
-        .end-of-day-display.show {
+        /* Holiday/End Display */
+        .special-display {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -652,14 +717,15 @@
             flex: 1;
         }
         
-        .end-title {
+        .special-title {
             font-size: 90px;
             font-weight: 900;
             color: #fff;
             margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
-        .end-message {
+        .special-message {
             font-size: 32px;
             font-weight: 700;
             color: #aaa;
@@ -667,40 +733,76 @@
             line-height: 1.5;
         }
         
-        /* Responsive */
-        @media (max-width: 900px) {
-            .train-type-badge { font-size: 28px; padding: 8px 18px; }
-            .current-subject { font-size: 55px; }
-            .day-display { font-size: 38px; }
-            .period-item { grid-template-columns: 80px 70px 70px 1fr 1fr 36px; gap: 6px; }
-        }
+        /* ===== FULLSCREEN SIZES ===== */
+        .fullscreen-board .board-header { padding: 2vh 3vw; }
+        .fullscreen-board .train-type-badge { font-size: 5vh; padding: 1.5vh 3vw; }
+        .fullscreen-board .next-label { font-size: 4vh; }
+        .fullscreen-board .time-label { font-size: 3vh; }
+        .fullscreen-board .time-value { font-size: 5vh; padding: 1.5vh 2.5vw; }
+        .fullscreen-board .class-number-value { font-size: 6vh; }
+        .fullscreen-board .class-unit { font-size: 2.5vh; }
+        .fullscreen-board .main-display { flex: 1; min-height: 0; }
+        .fullscreen-board .day-section { min-width: 15vw; padding: 2vh 2vw; }
+        .fullscreen-board .day-display { font-size: 8vh; }
+        .fullscreen-board .schedule-type-display { font-size: 3vh; }
+        .fullscreen-board .current-period-section { padding: 3vh 4vw; gap: 3vw; }
+        .fullscreen-board .period-indicator { width: 12vh; height: 12vh; }
+        .fullscreen-board .period-indicator-text { font-size: 7vh; }
+        .fullscreen-board .current-subject { font-size: 12vh; }
+        .fullscreen-board .break-timer { font-size: 15vh; }
+        .fullscreen-board .break-timer-label { font-size: 4vh; }
+        .fullscreen-board .break-next-subject { font-size: 3vh; }
+        .fullscreen-board .schedule-grid-section { padding: 2vh 3vw 1vh; }
+        .fullscreen-board .schedule-item { min-height: 14vh; }
+        .fullscreen-board .schedule-item .subject-char { font-size: 4vh; }
+        .fullscreen-board .timeline-section { padding: 1vh 3vw 2vh; }
+        .fullscreen-board .timeline { height: 7vh; }
+        .fullscreen-board .timeline-track { height: 2vh; }
+        .fullscreen-board .timeline-dot { width: 4vh; height: 4vh; }
+        .fullscreen-board .period-circle { min-width: 5vh; height: 5vh; font-size: 2.5vh; }
+        .fullscreen-board .room-info-section { padding: 1vh 3vw 2vh; }
+        .fullscreen-board .room-grid { font-size: 2vh; }
+        .fullscreen-board .announcement-section { padding: 1.5vh 3vw; }
+        .fullscreen-board .announcement-label { font-size: 2vh; }
+        .fullscreen-board .announcement-text { font-size: 2.5vh; }
+        .fullscreen-board .board-footer { padding: 2vh 3vw; }
+        .fullscreen-board .footer-message { font-size: 2.5vh; }
+        .fullscreen-board .special-title { font-size: 15vh; }
+        .fullscreen-board .special-message { font-size: 5vh; }
         
-        @media (max-width: 600px) {
-            .editor-grid { grid-template-columns: 1fr; }
-            .period-item { 
-                grid-template-columns: 1fr 1fr;
-                gap: 8px;
-            }
-            .period-item .delete-btn {
-                grid-column: 2;
-                justify-self: end;
-            }
+        @media (max-width: 900px) {
+            .period-item { grid-template-columns: 1fr 1fr 1fr; }
+            .holiday-item { grid-template-columns: auto 1fr 1fr; }
         }
     </style>
 </head>
 <body>
+    <!-- Fullscreen Container -->
+    <div class="fullscreen-board-container" id="fullscreenContainer">
+        <div class="fullscreen-board" id="fullscreenBoard"></div>
+    </div>
+    
+    <!-- Editor -->
     <div class="editor-container">
         <div class="page-header">
             <h1 class="page-title">🚃 <span>時間割表示板</span> エディター</h1>
             <button class="fullscreen-btn" onclick="enterFullscreen()">🖥️ 全画面表示</button>
         </div>
         
-        <!-- Editor Panel -->
-        <div class="editor-panel">
+        <!-- Main Tabs -->
+        <div class="main-tabs">
+            <button class="main-tab active" onclick="switchMainTab('basic')">基本設定</button>
+            <button class="main-tab" onclick="switchMainTab('schedule')">時間割</button>
+            <button class="main-tab" onclick="switchMainTab('holiday')">長期休み</button>
+            <button class="main-tab" onclick="switchMainTab('announce')">お知らせ</button>
+        </div>
+        
+        <!-- Basic Settings Tab -->
+        <div id="tab-basic" class="tab-content active">
             <div class="section-title">📋 基本設定</div>
             <div class="editor-grid">
                 <div class="form-group">
-                    <label>表示名（左上のラベル）</label>
+                    <label>表示名（左上ラベル）</label>
                     <input type="text" id="displayName" value="普 通" oninput="updateBoard()">
                 </div>
                 <div class="form-group">
@@ -708,13 +810,19 @@
                     <input type="text" id="classNum" value="3" oninput="updateBoard()">
                 </div>
                 <div class="form-group">
-                    <label>クラス単位（組など）</label>
+                    <label>クラス単位</label>
                     <input type="text" id="classUnit" value="組" oninput="updateBoard()">
                 </div>
                 <div class="form-group">
-                    <label>日課タイプ</label>
-                    <input type="text" id="scheduleType" value="日課" oninput="updateBoard()">
+                    <label>休憩時間（分）</label>
+                    <input type="number" id="breakMinutes" value="10" min="1" max="60" oninput="updateBoard()">
                 </div>
+            </div>
+            
+            <div class="section-title">⚙️ フッター設定</div>
+            <div class="form-group">
+                <label>通常時のフッター</label>
+                <input type="text" id="footerMsg" value="移動、準備時間は含まれません。授業により多少時間が異なります。" oninput="updateBoard()" style="width:100%">
             </div>
             
             <div class="section-title">🌙 終了後の表示</div>
@@ -723,27 +831,15 @@
                     <label>終了後のタイトル</label>
                     <input type="text" id="endTitle" value="本日終了" oninput="updateBoard()">
                 </div>
-                <div class="form-group" style="grid-column: span 2;">
+                <div class="form-group">
                     <label>終了後のメッセージ</label>
-                    <textarea id="endMessage" oninput="updateBoard()">本日の授業は全て終了しました。お疲れ様でした。</textarea>
+                    <input type="text" id="endMessage" value="本日の授業は全て終了しました。" oninput="updateBoard()">
+                </div>
+                <div class="form-group">
+                    <label>終了後のフッター</label>
+                    <input type="text" id="endFooterMsg" value="また明日お会いしましょう。" oninput="updateBoard()">
                 </div>
             </div>
-            
-            <div class="section-title">⚙️ フッター設定</div>
-            <div class="form-group">
-                <label>フッターメッセージ</label>
-                <input type="text" id="footerMsg" value="移動、準備時間は含まれません。授業により多少時間が異なります。" oninput="updateBoard()" style="width:100%">
-            </div>
-        </div>
-        
-        <!-- Schedule Editor -->
-        <div class="editor-panel">
-            <div class="section-title">📅 時間割編集</div>
-            <div class="day-tabs" id="dayTabs"></div>
-            
-            <div class="period-list" id="periodList"></div>
-            
-            <button class="add-period-btn" onclick="addPeriod()">＋ 時限を追加</button>
             
             <div class="button-row">
                 <button class="btn btn-save" onclick="saveData()">💾 保存</button>
@@ -752,9 +848,89 @@
             </div>
         </div>
         
-        <!-- Preview -->
-        <div class="preview-label">▼ プレビュー（実際の時間に連動）</div>
-        <div class="board" id="board"></div>
+        <!-- Schedule Tab -->
+        <div id="tab-schedule" class="tab-content">
+            <div class="section-title">📅 日課タイプ選択</div>
+            <div class="schedule-type-tabs" id="scheduleTypeTabs"></div>
+            <button class="add-btn" onclick="addScheduleType()" style="margin-bottom:20px;">＋ 日課タイプを追加</button>
+            
+            <div class="section-title">📅 曜日別の日課タイプ設定</div>
+            <div class="editor-grid" id="dayScheduleTypeGrid"></div>
+            
+            <div class="section-title">📚 時間割編集</div>
+            <div class="day-tabs" id="dayTabs"></div>
+            <div class="period-list" id="periodList"></div>
+            <button class="add-btn" onclick="addPeriod()">＋ 時限を追加</button>
+        </div>
+        
+        <!-- Holiday Tab -->
+        <div id="tab-holiday" class="tab-content">
+            <div class="section-title">🎌 祝日自動検出</div>
+            <div class="editor-grid">
+                <div class="form-group">
+                    <label>日本の祝日を自動で休み表示</label>
+                    <select id="autoNationalHoliday" onchange="updateBoard()">
+                        <option value="1">有効</option>
+                        <option value="0">無効</option>
+                    </select>
+                </div>
+            </div>
+            <p style="color:#666; margin-bottom:15px; font-size:13px;">※元日、成人の日、建国記念の日、天皇誕生日、春分の日、昭和の日、憲法記念日、みどりの日、こどもの日、海の日、山の日、敬老の日、秋分の日、スポーツの日、文化の日、勤労感謝の日、振替休日に対応</p>
+            
+            <div class="section-title" style="margin-top:20px;">🏖️ 長期休み設定</div>
+            <p style="color:#666; margin-bottom:15px;">チェックを入れると、その期間は休み表示になります。</p>
+            <div id="holidayList"></div>
+            <button class="add-btn" onclick="addHoliday()">＋ 休み期間を追加</button>
+            
+            <div class="section-title" style="margin-top:30px;">🎉 休み・祝日中の表示</div>
+            <div class="editor-grid">
+                <div class="form-group">
+                    <label>長期休み中のタイトル</label>
+                    <input type="text" id="holidayTitle" value="長期休み中" oninput="updateBoard()">
+                </div>
+                <div class="form-group">
+                    <label>長期休み中のメッセージ</label>
+                    <input type="text" id="holidayMessage" value="ゆっくり休んでね！" oninput="updateBoard()">
+                </div>
+                <div class="form-group">
+                    <label>長期休み中のフッター</label>
+                    <input type="text" id="holidayFooterMsg" value="次の登校日をお楽しみに！" oninput="updateBoard()">
+                </div>
+            </div>
+            <div class="editor-grid" style="margin-top:15px;">
+                <div class="form-group">
+                    <label>祝日のタイトル</label>
+                    <input type="text" id="nationalHolidayTitle" value="本日は祝日です" oninput="updateBoard()">
+                </div>
+                <div class="form-group">
+                    <label>祝日のメッセージ</label>
+                    <input type="text" id="nationalHolidayMessage" value="ゆっくりお休みください" oninput="updateBoard()">
+                </div>
+                <div class="form-group">
+                    <label>祝日のフッター</label>
+                    <input type="text" id="nationalHolidayFooterMsg" value="次の登校日に会いましょう！" oninput="updateBoard()">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Announcement Tab -->
+        <div id="tab-announce" class="tab-content">
+            <div class="section-title">📢 お知らせ設定</div>
+            <div class="form-group">
+                <label>お知らせを表示する</label>
+                <select id="showAnnouncement" onchange="updateBoard()">
+                    <option value="0">表示しない</option>
+                    <option value="1">表示する</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-top:15px;">
+                <label>お知らせ内容（スクロール表示されます）</label>
+                <textarea id="announcementText" rows="3" oninput="updateBoard()" style="width:100%">本日の放課後、体育館で全校集会があります。全員参加してください。</textarea>
+            </div>
+        </div>
+        
+        <div class="preview-label">▼ プレビュー</div>
+        <div class="board-preview" id="previewBoard"></div>
     </div>
     
     <script>
@@ -765,14 +941,30 @@
             displayName: '普 通',
             classNum: '3',
             classUnit: '組',
-            scheduleType: '日課',
+            breakMinutes: 10,
             footerMsg: '移動、準備時間は含まれません。授業により多少時間が異なります。',
             endTitle: '本日終了',
-            endMessage: '本日の授業は全て終了しました。お疲れ様でした。',
-            schedule: []
+            endMessage: '本日の授業は全て終了しました。',
+            endFooterMsg: 'また明日お会いしましょう。',
+            holidayTitle: '長期休み中',
+            holidayMessage: 'ゆっくり休んでね！',
+            holidayFooterMsg: '次の登校日をお楽しみに！',
+            autoNationalHoliday: true,
+            nationalHolidayTitle: '本日は祝日です',
+            nationalHolidayMessage: 'ゆっくりお休みください',
+            nationalHolidayFooterMsg: '次の登校日に会いましょう！',
+            showAnnouncement: false,
+            announcementText: '本日の放課後、体育館で全校集会があります。',
+            scheduleTypes: ['通常', '短縮', '特別'],
+            currentScheduleType: '通常',
+            dayScheduleTypes: ['通常', '通常', '通常', '通常', '通常', '通常', '通常'],
+            holidays: [],
+            schedules: {}
         };
         
-        // Initialize default schedule for each day
+        let currentEditDay = 0;
+        let currentEditScheduleType = '通常';
+        
         function initDefaultSchedule() {
             const defaultPeriods = [
                 { label: '朝HR', start: '08:30', end: '08:40', isHR: true },
@@ -783,6 +975,15 @@
                 { label: '5', start: '13:30', end: '14:20' },
                 { label: '6', start: '14:30', end: '15:20' },
                 { label: 'HR', start: '15:25', end: '15:35', isHR: true }
+            ];
+            
+            const shortPeriods = [
+                { label: '朝HR', start: '08:30', end: '08:35', isHR: true },
+                { label: '1', start: '08:40', end: '09:20' },
+                { label: '2', start: '09:30', end: '10:10' },
+                { label: '3', start: '10:20', end: '11:00' },
+                { label: '4', start: '11:10', end: '11:50' },
+                { label: 'HR', start: '11:55', end: '12:05', isHR: true }
             ];
             
             const defaultSubjects = [
@@ -805,7 +1006,10 @@
                 ['', '', '', '', '', '', '', '']
             ];
             
-            config.schedule = [];
+            config.schedules = {};
+            
+            // 通常日課
+            config.schedules['通常'] = [];
             for (let d = 0; d < 7; d++) {
                 const daySchedule = [];
                 for (let p = 0; p < defaultPeriods.length; p++) {
@@ -815,85 +1019,97 @@
                         room: defaultRooms[d][p] || ''
                     });
                 }
-                config.schedule.push(daySchedule);
+                config.schedules['通常'].push(daySchedule);
             }
+            
+            // 短縮日課
+            config.schedules['短縮'] = [];
+            for (let d = 0; d < 7; d++) {
+                const daySchedule = [];
+                for (let p = 0; p < shortPeriods.length; p++) {
+                    daySchedule.push({
+                        ...shortPeriods[p],
+                        subject: defaultSubjects[d][p] || '',
+                        room: ''
+                    });
+                }
+                config.schedules['短縮'].push(daySchedule);
+            }
+            
+            // 特別日課
+            config.schedules['特別'] = JSON.parse(JSON.stringify(config.schedules['通常']));
         }
         
-        let currentEditDay = 0;
-        
-        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             initDefaultSchedule();
             loadFromStorage();
-            renderDayTabs();
-            renderPeriodList();
+            renderAll();
             updateBoard();
-            startRealtime();
+            setInterval(updateBoard, 1000);
+            
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
         });
         
-        function startRealtime() {
-            setInterval(updateBoard, 1000);
-        }
-        
-        function getCurrentTimeInfo() {
-            const now = new Date();
-            const timeStr = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
-            const dayOfWeek = now.getDay();
-            const adjustedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-            
-            const currentMinutes = now.getHours() * 60 + now.getMinutes();
-            const daySchedule = config.schedule[adjustedDay];
-            
-            let currentPeriod = -1;
-            let periodProgress = 0;
-            let isEnded = false;
-            
-            if (daySchedule && daySchedule.length > 0) {
-                // Check if before first period
-                const firstStart = timeToMinutes(daySchedule[0].start);
-                if (currentMinutes < firstStart) {
-                    currentPeriod = -1;
-                } else {
-                    // Check each period
-                    for (let i = 0; i < daySchedule.length; i++) {
-                        const startMin = timeToMinutes(daySchedule[i].start);
-                        const endMin = timeToMinutes(daySchedule[i].end);
-                        
-                        if (currentMinutes >= startMin && currentMinutes < endMin) {
-                            currentPeriod = i;
-                            periodProgress = (currentMinutes - startMin) / (endMin - startMin);
-                            break;
-                        } else if (currentMinutes >= endMin) {
-                            currentPeriod = i;
-                        }
-                    }
-                    
-                    // Check if after last period
-                    const lastEnd = timeToMinutes(daySchedule[daySchedule.length - 1].end);
-                    if (currentMinutes >= lastEnd) {
-                        isEnded = true;
-                    }
-                }
-            }
-            
-            return { time: timeStr, day: adjustedDay, period: currentPeriod, progress: periodProgress, isEnded };
-        }
-        
-        function timeToMinutes(timeStr) {
-            if (!timeStr) return 0;
-            const [h, m] = timeStr.split(':').map(Number);
-            return h * 60 + m;
+        function handleFullscreenChange() {
+            const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+            document.body.classList.toggle('fullscreen-mode', isFs);
+            updateBoard();
         }
         
         function enterFullscreen() {
-            const board = document.getElementById('board');
-            if (board.requestFullscreen) {
-                board.requestFullscreen();
-            } else if (board.webkitRequestFullscreen) {
-                board.webkitRequestFullscreen();
-            } else if (board.msRequestFullscreen) {
-                board.msRequestFullscreen();
+            const el = document.getElementById('fullscreenContainer');
+            if (el.requestFullscreen) el.requestFullscreen();
+            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        }
+        
+        function switchMainTab(name) {
+            document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-' + name).classList.add('active');
+        }
+        
+        function renderAll() {
+            renderScheduleTypeTabs();
+            renderDayScheduleTypeGrid();
+            renderDayTabs();
+            renderPeriodList();
+            renderHolidayList();
+        }
+        
+        function renderScheduleTypeTabs() {
+            const container = document.getElementById('scheduleTypeTabs');
+            container.innerHTML = config.scheduleTypes.map(type =>
+                `<button class="schedule-type-tab ${type === currentEditScheduleType ? 'active' : ''}" onclick="switchScheduleType('${type}')">${type}</button>`
+            ).join('');
+        }
+        
+        function switchScheduleType(type) {
+            currentEditScheduleType = type;
+            renderScheduleTypeTabs();
+            renderPeriodList();
+        }
+        
+        function addScheduleType() {
+            const name = prompt('新しい日課タイプ名を入力:');
+            if (name && !config.scheduleTypes.includes(name)) {
+                config.scheduleTypes.push(name);
+                config.schedules[name] = JSON.parse(JSON.stringify(config.schedules['通常']));
+                renderAll();
             }
+        }
+        
+        function renderDayScheduleTypeGrid() {
+            const container = document.getElementById('dayScheduleTypeGrid');
+            container.innerHTML = dayNames.map((day, i) => `
+                <div class="form-group">
+                    <label>${day}の日課</label>
+                    <select onchange="config.dayScheduleTypes[${i}] = this.value; updateBoard()">
+                        ${config.scheduleTypes.map(t => `<option value="${t}" ${config.dayScheduleTypes[i] === t ? 'selected' : ''}>${t}</option>`).join('')}
+                    </select>
+                </div>
+            `).join('');
         }
         
         function renderDayTabs() {
@@ -911,169 +1127,434 @@
         
         function renderPeriodList() {
             const container = document.getElementById('periodList');
-            const daySchedule = config.schedule[currentEditDay];
+            if (!config.schedules[currentEditScheduleType]) {
+                config.schedules[currentEditScheduleType] = JSON.parse(JSON.stringify(config.schedules['通常']));
+            }
+            const daySchedule = config.schedules[currentEditScheduleType][currentEditDay];
             
-            container.innerHTML = daySchedule.map((period, i) => `
+            container.innerHTML = daySchedule.map((p, i) => `
                 <div class="period-item">
-                    <input type="text" class="label-input" value="${period.label}" 
-                           onchange="updatePeriod(${i}, 'label', this.value)" placeholder="時限名">
-                    <input type="time" class="time-input" value="${period.start}" 
-                           onchange="updatePeriod(${i}, 'start', this.value)">
-                    <input type="time" class="time-input" value="${period.end}" 
-                           onchange="updatePeriod(${i}, 'end', this.value)">
-                    <input type="text" value="${period.subject}" 
-                           onchange="updatePeriod(${i}, 'subject', this.value)" placeholder="科目">
-                    <input type="text" value="${period.room}" 
-                           onchange="updatePeriod(${i}, 'room', this.value)" placeholder="教室">
+                    <input type="text" class="label-input" value="${p.label}" onchange="updatePeriod(${i}, 'label', this.value)">
+                    <input type="time" value="${p.start}" onchange="updatePeriod(${i}, 'start', this.value)">
+                    <input type="time" value="${p.end}" onchange="updatePeriod(${i}, 'end', this.value)">
+                    <input type="text" value="${p.subject}" onchange="updatePeriod(${i}, 'subject', this.value)" placeholder="科目">
+                    <input type="text" value="${p.room}" onchange="updatePeriod(${i}, 'room', this.value)" placeholder="教室">
                     <button class="delete-btn" onclick="deletePeriod(${i})">×</button>
                 </div>
             `).join('');
         }
         
         function updatePeriod(index, field, value) {
-            config.schedule[currentEditDay][index][field] = value;
+            config.schedules[currentEditScheduleType][currentEditDay][index][field] = value;
             if (field === 'label') {
-                config.schedule[currentEditDay][index].isHR = 
-                    value.includes('HR') || value.includes('ホーム');
+                config.schedules[currentEditScheduleType][currentEditDay][index].isHR = value.includes('HR');
             }
             updateBoard();
         }
         
         function addPeriod() {
-            const daySchedule = config.schedule[currentEditDay];
-            const lastPeriod = daySchedule[daySchedule.length - 1];
-            
-            // Calculate new times
-            let newStart = '09:00';
-            let newEnd = '09:50';
-            if (lastPeriod) {
-                const lastEndMin = timeToMinutes(lastPeriod.end);
-                const newStartMin = lastEndMin + 10;
-                const newEndMin = newStartMin + 50;
-                newStart = `${String(Math.floor(newStartMin / 60)).padStart(2, '0')}:${String(newStartMin % 60).padStart(2, '0')}`;
-                newEnd = `${String(Math.floor(newEndMin / 60)).padStart(2, '0')}:${String(newEndMin % 60).padStart(2, '0')}`;
+            const daySchedule = config.schedules[currentEditScheduleType][currentEditDay];
+            const last = daySchedule[daySchedule.length - 1];
+            let newStart = '09:00', newEnd = '09:50';
+            if (last) {
+                const endMin = timeToMinutes(last.end) + 10;
+                newStart = minutesToTime(endMin);
+                newEnd = minutesToTime(endMin + 50);
             }
-            
-            // Find next period number
-            const numbers = daySchedule.map(p => parseInt(p.label)).filter(n => !isNaN(n));
-            const nextNum = numbers.length > 0 ? Math.max(...numbers) + 1 : 1;
-            
-            daySchedule.push({
-                label: String(nextNum),
-                start: newStart,
-                end: newEnd,
-                subject: '',
-                room: '',
-                isHR: false
-            });
-            
+            const nums = daySchedule.map(p => parseInt(p.label)).filter(n => !isNaN(n));
+            const nextNum = nums.length > 0 ? Math.max(...nums) + 1 : 1;
+            daySchedule.push({ label: String(nextNum), start: newStart, end: newEnd, subject: '', room: '', isHR: false });
             renderPeriodList();
             updateBoard();
         }
         
         function deletePeriod(index) {
-            if (config.schedule[currentEditDay].length > 1) {
-                config.schedule[currentEditDay].splice(index, 1);
+            const daySchedule = config.schedules[currentEditScheduleType][currentEditDay];
+            if (daySchedule.length > 1) {
+                daySchedule.splice(index, 1);
                 renderPeriodList();
                 updateBoard();
             }
         }
         
-        function updateBoard() {
-            config.displayName = document.getElementById('displayName').value;
-            config.classNum = document.getElementById('classNum').value;
-            config.classUnit = document.getElementById('classUnit').value;
-            config.scheduleType = document.getElementById('scheduleType').value;
-            config.footerMsg = document.getElementById('footerMsg').value;
-            config.endTitle = document.getElementById('endTitle').value;
-            config.endMessage = document.getElementById('endMessage').value;
+        function renderHolidayList() {
+            const container = document.getElementById('holidayList');
+            container.innerHTML = config.holidays.map((h, i) => `
+                <div class="holiday-item">
+                    <input type="checkbox" ${h.enabled ? 'checked' : ''} onchange="config.holidays[${i}].enabled = this.checked; updateBoard()">
+                    <input type="date" value="${h.start}" onchange="config.holidays[${i}].start = this.value; updateBoard()">
+                    <input type="date" value="${h.end}" onchange="config.holidays[${i}].end = this.value; updateBoard()">
+                    <input type="text" value="${h.name}" onchange="config.holidays[${i}].name = this.value; updateBoard()" placeholder="休み名（夏休みなど）">
+                    <button class="delete-btn" onclick="deleteHoliday(${i})">×</button>
+                </div>
+            `).join('');
+        }
+        
+        function addHoliday() {
+            const today = new Date().toISOString().split('T')[0];
+            config.holidays.push({ enabled: true, start: today, end: today, name: '新しい休み' });
+            renderHolidayList();
+        }
+        
+        function deleteHoliday(index) {
+            config.holidays.splice(index, 1);
+            renderHolidayList();
+            updateBoard();
+        }
+        
+        function timeToMinutes(t) {
+            if (!t) return 0;
+            const [h, m] = t.split(':').map(Number);
+            return h * 60 + m;
+        }
+        
+        function minutesToTime(m) {
+            return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+        }
+        
+        function isHoliday(date) {
+            const dateStr = date.toISOString().split('T')[0];
+            return config.holidays.some(h => h.enabled && dateStr >= h.start && dateStr <= h.end);
+        }
+        
+        function getCurrentHolidayName(date) {
+            const dateStr = date.toISOString().split('T')[0];
+            const holiday = config.holidays.find(h => h.enabled && dateStr >= h.start && dateStr <= h.end);
+            return holiday ? holiday.name : '';
+        }
+        
+        // Japanese National Holiday Detection
+        function getNthWeekday(year, month, nth, weekday) {
+            // Get nth weekday of month (weekday: 0=Sun, 1=Mon, etc.)
+            const first = new Date(year, month, 1);
+            const firstWeekday = first.getDay();
+            let day = 1 + (weekday - firstWeekday + 7) % 7 + (nth - 1) * 7;
+            return new Date(year, month, day);
+        }
+        
+        function getSpringEquinox(year) {
+            // Approximate spring equinox for Japan
+            const day = Math.floor(20.8431 + 0.242194 * (year - 1980) - Math.floor((year - 1980) / 4));
+            return new Date(year, 2, day); // March
+        }
+        
+        function getAutumnEquinox(year) {
+            // Approximate autumn equinox for Japan
+            const day = Math.floor(23.2488 + 0.242194 * (year - 1980) - Math.floor((year - 1980) / 4));
+            return new Date(year, 8, day); // September
+        }
+        
+        function getJapaneseHolidays(year) {
+            const holidays = [];
             
-            const timeInfo = getCurrentTimeInfo();
+            // Fixed holidays
+            holidays.push({ date: new Date(year, 0, 1), name: '元日' });
+            holidays.push({ date: new Date(year, 1, 11), name: '建国記念の日' });
+            holidays.push({ date: new Date(year, 1, 23), name: '天皇誕生日' });
+            holidays.push({ date: new Date(year, 3, 29), name: '昭和の日' });
+            holidays.push({ date: new Date(year, 4, 3), name: '憲法記念日' });
+            holidays.push({ date: new Date(year, 4, 4), name: 'みどりの日' });
+            holidays.push({ date: new Date(year, 4, 5), name: 'こどもの日' });
+            holidays.push({ date: new Date(year, 7, 11), name: '山の日' });
+            holidays.push({ date: new Date(year, 10, 3), name: '文化の日' });
+            holidays.push({ date: new Date(year, 10, 23), name: '勤労感謝の日' });
+            
+            // Happy Monday holidays
+            holidays.push({ date: getNthWeekday(year, 0, 2, 1), name: '成人の日' }); // 2nd Monday Jan
+            holidays.push({ date: getNthWeekday(year, 6, 3, 1), name: '海の日' }); // 3rd Monday Jul
+            holidays.push({ date: getNthWeekday(year, 8, 3, 1), name: '敬老の日' }); // 3rd Monday Sep
+            holidays.push({ date: getNthWeekday(year, 9, 2, 1), name: 'スポーツの日' }); // 2nd Monday Oct
+            
+            // Equinoxes
+            holidays.push({ date: getSpringEquinox(year), name: '春分の日' });
+            holidays.push({ date: getAutumnEquinox(year), name: '秋分の日' });
+            
+            // Calculate substitute holidays (振替休日)
+            const substituteHolidays = [];
+            for (const h of holidays) {
+                if (h.date.getDay() === 0) { // Sunday
+                    const substitute = new Date(h.date);
+                    substitute.setDate(substitute.getDate() + 1);
+                    // Check if next day is also a holiday
+                    while (holidays.some(hh => hh.date.getTime() === substitute.getTime()) ||
+                           substituteHolidays.some(sh => sh.date.getTime() === substitute.getTime())) {
+                        substitute.setDate(substitute.getDate() + 1);
+                    }
+                    substituteHolidays.push({ date: substitute, name: '振替休日' });
+                }
+            }
+            
+            return [...holidays, ...substituteHolidays];
+        }
+        
+        function getNationalHoliday(date) {
+            if (!config.autoNationalHoliday) return null;
+            
+            const year = date.getFullYear();
+            const holidays = getJapaneseHolidays(year);
+            
+            const dateStr = date.toDateString();
+            const found = holidays.find(h => h.date.toDateString() === dateStr);
+            return found || null;
+        }
+        
+        function getCurrentTimeInfo() {
+            const now = new Date();
+            const timeStr = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+            const dayOfWeek = now.getDay();
+            const adjustedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            
+            // Long holiday check (user-defined)
+            if (isHoliday(now)) {
+                return { 
+                    time: timeStr, 
+                    day: adjustedDay, 
+                    isHoliday: true, 
+                    isNationalHoliday: false,
+                    holidayName: getCurrentHolidayName(now) 
+                };
+            }
+            
+            // National holiday check (auto-detected)
+            const nationalHoliday = getNationalHoliday(now);
+            if (nationalHoliday) {
+                return {
+                    time: timeStr,
+                    day: adjustedDay,
+                    isHoliday: false,
+                    isNationalHoliday: true,
+                    nationalHolidayName: nationalHoliday.name
+                };
+            }
+            
+            const scheduleType = config.dayScheduleTypes[adjustedDay];
+            const daySchedule = config.schedules[scheduleType]?.[adjustedDay] || [];
+            
+            let currentPeriod = -1;
+            let periodProgress = 0;
+            let isEnded = false;
+            let isBreak = false;
+            let breakRemaining = 0;
+            let nextSubject = '';
+            
+            if (daySchedule.length > 0) {
+                const firstStart = timeToMinutes(daySchedule[0].start);
+                const lastEnd = timeToMinutes(daySchedule[daySchedule.length - 1].end);
+                
+                if (currentMinutes < firstStart) {
+                    currentPeriod = -1;
+                } else if (currentMinutes >= lastEnd) {
+                    isEnded = true;
+                } else {
+                    for (let i = 0; i < daySchedule.length; i++) {
+                        const startMin = timeToMinutes(daySchedule[i].start);
+                        const endMin = timeToMinutes(daySchedule[i].end);
+                        
+                        if (currentMinutes >= startMin && currentMinutes < endMin) {
+                            currentPeriod = i;
+                            periodProgress = (currentMinutes - startMin) / (endMin - startMin);
+                            break;
+                        } else if (i < daySchedule.length - 1) {
+                            const nextStart = timeToMinutes(daySchedule[i + 1].start);
+                            if (currentMinutes >= endMin && currentMinutes < nextStart) {
+                                isBreak = true;
+                                breakRemaining = nextStart - currentMinutes;
+                                nextSubject = daySchedule[i + 1].subject || '次の授業';
+                                currentPeriod = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return {
+                time: timeStr,
+                day: adjustedDay,
+                scheduleType,
+                period: currentPeriod,
+                progress: periodProgress,
+                isEnded,
+                isBreak,
+                breakRemaining,
+                nextSubject,
+                isHoliday: false
+            };
+        }
+        
+        function generateBoardHTML(timeInfo) {
+            readConfigFromInputs();
+            
             const day = timeInfo.day;
-            const daySchedule = config.schedule[day];
-            const period = timeInfo.period;
+            const showAnnounce = config.showAnnouncement && !timeInfo.isHoliday && !timeInfo.isNationalHoliday && !timeInfo.isEnded;
             
-            let currentSubject = '';
-            let periodDisplay = '';
-            
-            if (timeInfo.isEnded) {
-                // Show end of day
-                document.getElementById('board').innerHTML = `
+            // Long holiday display (user-defined)
+            if (timeInfo.isHoliday) {
+                return `
                     <div class="board-header">
                         <div class="train-type-badge">${config.displayName}</div>
-                        <div class="next-label"></div>
                         <div class="header-right">
                             <div class="time-section">
                                 <span class="time-label">現在時刻</span>
                                 <span class="time-value">${timeInfo.time}</span>
                             </div>
                             <div class="class-badge">
-                                <div class="class-number-box">
-                                    <span class="class-number-value">${config.classNum}</span>
-                                </div>
+                                <div class="class-number-box"><span class="class-number-value">${config.classNum}</span></div>
                                 <span class="class-unit">${config.classUnit}</span>
                             </div>
                         </div>
                     </div>
-                    <div class="main-display" style="flex:1;">
+                    <div class="main-display">
                         <div class="day-section">
                             <div class="day-display">${dayDisplay[day]}</div>
-                            <div class="schedule-type-display">${config.scheduleType}</div>
+                            <div class="schedule-type-display">${timeInfo.holidayName || '休み'}</div>
                         </div>
-                        <div class="end-of-day-display show">
-                            <div class="end-title">${config.endTitle}</div>
-                            <div class="end-message">${config.endMessage.replace(/\n/g, '<br>')}</div>
+                        <div class="special-display">
+                            <div class="special-title">${config.holidayTitle}</div>
+                            <div class="special-message">${config.holidayMessage}</div>
                         </div>
                     </div>
-                    <div class="board-footer">
-                        <p class="footer-message">${config.footerMsg}</p>
+                    <div class="board-footer"><p class="footer-message">${config.holidayFooterMsg}</p></div>
+                `;
+            }
+            
+            // National holiday display (auto-detected)
+            if (timeInfo.isNationalHoliday) {
+                return `
+                    <div class="board-header">
+                        <div class="train-type-badge">${config.displayName}</div>
+                        <div class="header-right">
+                            <div class="time-section">
+                                <span class="time-label">現在時刻</span>
+                                <span class="time-value">${timeInfo.time}</span>
+                            </div>
+                            <div class="class-badge">
+                                <div class="class-number-box"><span class="class-number-value">${config.classNum}</span></div>
+                                <span class="class-unit">${config.classUnit}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="main-display">
+                        <div class="day-section">
+                            <div class="day-display">${dayDisplay[day]}</div>
+                            <div class="schedule-type-display">${timeInfo.nationalHolidayName}</div>
+                        </div>
+                        <div class="special-display">
+                            <div class="special-title">${config.nationalHolidayTitle}</div>
+                            <div class="special-message">${config.nationalHolidayMessage}</div>
+                        </div>
+                    </div>
+                    <div class="board-footer"><p class="footer-message">${config.nationalHolidayFooterMsg}</p></div>
+                `;
+            }
+            
+            // Ended display
+            if (timeInfo.isEnded) {
+                return `
+                    <div class="board-header">
+                        <div class="train-type-badge">${config.displayName}</div>
+                        <div class="header-right">
+                            <div class="time-section">
+                                <span class="time-label">現在時刻</span>
+                                <span class="time-value">${timeInfo.time}</span>
+                            </div>
+                            <div class="class-badge">
+                                <div class="class-number-box"><span class="class-number-value">${config.classNum}</span></div>
+                                <span class="class-unit">${config.classUnit}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="main-display">
+                        <div class="day-section">
+                            <div class="day-display">${dayDisplay[day]}</div>
+                            <div class="schedule-type-display">${timeInfo.scheduleType}</div>
+                        </div>
+                        <div class="special-display">
+                            <div class="special-title">${config.endTitle}</div>
+                            <div class="special-message">${config.endMessage}</div>
+                        </div>
+                    </div>
+                    <div class="board-footer"><p class="footer-message">${config.endFooterMsg}</p></div>
+                `;
+            }
+            
+            const scheduleType = timeInfo.scheduleType;
+            const daySchedule = config.schedules[scheduleType]?.[day] || [];
+            const period = timeInfo.period;
+            
+            let mainContent = '';
+            
+            if (timeInfo.isBreak) {
+                // Break time with countdown
+                const mins = Math.floor(timeInfo.breakRemaining);
+                const secs = Math.floor((timeInfo.breakRemaining % 1) * 60);
+                const timerClass = mins < 2 ? 'break-timer urgent' : 'break-timer';
+                
+                mainContent = `
+                    <div class="break-timer-container">
+                        <div class="break-timer-label">🔔 休憩中 - 次の授業まで</div>
+                        <div class="${timerClass}">${mins}:${String(secs).padStart(2, '0')}</div>
+                        <div class="break-next-subject">次は「${timeInfo.nextSubject}」</div>
                     </div>
                 `;
-                return;
+            } else {
+                let currentSubject = '授業前';
+                let periodDisplay = '−';
+                
+                if (period >= 0 && period < daySchedule.length) {
+                    currentSubject = daySchedule[period].subject || '−';
+                    periodDisplay = daySchedule[period].label || '';
+                }
+                
+                mainContent = `
+                    <div class="current-period-section">
+                        <div class="period-indicator">
+                            <span class="period-indicator-text">${periodDisplay}</span>
+                        </div>
+                        <div class="current-subject">${currentSubject}</div>
+                    </div>
+                `;
             }
             
-            if (period < 0 || !daySchedule || daySchedule.length === 0) {
-                currentSubject = '授業前';
-                periodDisplay = '−';
-            } else if (period < daySchedule.length) {
-                currentSubject = daySchedule[period].subject || '−';
-                periodDisplay = daySchedule[period].label || '';
-            }
-            
-            // Generate schedule items
-            let scheduleItems = '';
-            let timelineItems = '';
-            let roomItems = '';
-            
+            // Schedule grid
+            let scheduleItems = '', timelineItems = '', roomItems = '';
             let progressWidth = 0;
             
-            if (daySchedule && daySchedule.length > 0) {
-                for (let i = 0; i < daySchedule.length; i++) {
-                    const p = daySchedule[i];
-                    const isHR = p.isHR || p.label.includes('HR');
-                    const isActive = period === i && !timeInfo.isEnded;
-                    const isPassed = period > i || timeInfo.isEnded;
-                    const statusClass = isActive ? 'active' : (isPassed ? 'passed' : '');
-                    
-                    scheduleItems += `<div class="schedule-item ${isHR ? 'hr-slot' : ''}">${formatSubject(p.subject)}</div>`;
-                    
-                    if (isHR) {
-                        timelineItems += `<div class="timeline-marker hr-slot"><div class="timeline-dot ${isPassed || isActive ? 'filled' : ''}"></div></div>`;
-                    } else {
-                        timelineItems += `<div class="timeline-marker"><div class="period-circle ${statusClass}">${p.label}</div></div>`;
-                    }
-                    
-                    roomItems += `<span class="${isHR ? 'hr-slot' : ''}">${p.room}</span>`;
-                    
-                    if (isPassed) {
-                        progressWidth = ((i + 1) / daySchedule.length) * 100;
-                    } else if (isActive) {
-                        progressWidth = ((i + timeInfo.progress) / daySchedule.length) * 100;
-                    }
+            for (let i = 0; i < daySchedule.length; i++) {
+                const p = daySchedule[i];
+                const isHR = p.isHR || p.label.includes('HR');
+                const isActive = period === i && !timeInfo.isBreak;
+                const isPassed = period > i || (period === i && timeInfo.isBreak);
+                const statusClass = isActive ? 'active' : (isPassed ? 'passed' : '');
+                
+                scheduleItems += `<div class="schedule-item ${isHR ? 'hr-slot' : ''}">${formatSubject(p.subject)}</div>`;
+                
+                if (isHR) {
+                    timelineItems += `<div class="timeline-marker hr-slot"><div class="timeline-dot ${isPassed || isActive ? 'filled' : ''}"></div></div>`;
+                } else {
+                    timelineItems += `<div class="timeline-marker"><div class="period-circle ${statusClass}">${p.label}</div></div>`;
+                }
+                
+                roomItems += `<span class="${isHR ? 'hr-slot' : ''}">${p.room}</span>`;
+                
+                if (isPassed) {
+                    progressWidth = ((i + 1) / daySchedule.length) * 100;
+                } else if (isActive) {
+                    progressWidth = ((i + timeInfo.progress) / daySchedule.length) * 100;
                 }
             }
             
-            document.getElementById('board').innerHTML = `
+            const announcementHTML = showAnnounce ? `
+                <div class="announcement-section">
+                    <div class="announcement-ticker">
+                        <span class="announcement-label">📢 お知らせ</span>
+                        <span class="announcement-text">${config.announcementText}</span>
+                    </div>
+                </div>
+            ` : '';
+            
+            return `
                 <div class="board-header">
                     <div class="train-type-badge">${config.displayName}</div>
                     <div class="next-label">次は</div>
@@ -1083,130 +1564,113 @@
                             <span class="time-value">${timeInfo.time}</span>
                         </div>
                         <div class="class-badge">
-                            <div class="class-number-box">
-                                <span class="class-number-value">${config.classNum}</span>
-                            </div>
+                            <div class="class-number-box"><span class="class-number-value">${config.classNum}</span></div>
                             <span class="class-unit">${config.classUnit}</span>
                         </div>
                     </div>
                 </div>
-                
                 <div class="main-display">
                     <div class="day-section">
                         <div class="day-display">${dayDisplay[day]}</div>
-                        <div class="schedule-type-display">${config.scheduleType}</div>
+                        <div class="schedule-type-display">${scheduleType}</div>
                     </div>
-                    <div class="current-period-section">
-                        <div class="period-indicator">
-                            <span class="period-indicator-text">${periodDisplay}</span>
-                        </div>
-                        <div class="current-subject">${currentSubject}</div>
-                    </div>
+                    ${mainContent}
                 </div>
-                
                 <div class="schedule-grid-section">
-                    <div class="schedule-grid">
-                        ${scheduleItems}
-                    </div>
+                    <div class="schedule-grid">${scheduleItems}</div>
                 </div>
-                
                 <div class="timeline-section">
                     <div class="timeline">
-                        <div class="timeline-track">
-                            <div class="progress-fill" style="width: ${progressWidth}%"></div>
-                        </div>
+                        <div class="timeline-track"><div class="progress-fill" style="width:${progressWidth}%"></div></div>
                         ${timelineItems}
                     </div>
                 </div>
-                
                 <div class="room-info-section">
-                    <div class="room-grid">
-                        ${roomItems}
-                    </div>
+                    <div class="room-grid">${roomItems}</div>
                 </div>
-                
-                <div class="board-footer">
-                    <p class="footer-message">${config.footerMsg}</p>
-                </div>
+                ${announcementHTML}
+                <div class="board-footer"><p class="footer-message">${footerText}</p></div>
             `;
+        }
+        
+        function readConfigFromInputs() {
+            config.displayName = document.getElementById('displayName')?.value || config.displayName;
+            config.classNum = document.getElementById('classNum')?.value || config.classNum;
+            config.classUnit = document.getElementById('classUnit')?.value || config.classUnit;
+            config.breakMinutes = parseInt(document.getElementById('breakMinutes')?.value) || 10;
+            config.footerMsg = document.getElementById('footerMsg')?.value || config.footerMsg;
+            config.endTitle = document.getElementById('endTitle')?.value || config.endTitle;
+            config.endMessage = document.getElementById('endMessage')?.value || config.endMessage;
+            config.endFooterMsg = document.getElementById('endFooterMsg')?.value || config.endFooterMsg;
+            config.holidayTitle = document.getElementById('holidayTitle')?.value || config.holidayTitle;
+            config.holidayMessage = document.getElementById('holidayMessage')?.value || config.holidayMessage;
+            config.holidayFooterMsg = document.getElementById('holidayFooterMsg')?.value || config.holidayFooterMsg;
+            config.autoNationalHoliday = document.getElementById('autoNationalHoliday')?.value === '1';
+            config.nationalHolidayTitle = document.getElementById('nationalHolidayTitle')?.value || config.nationalHolidayTitle;
+            config.nationalHolidayMessage = document.getElementById('nationalHolidayMessage')?.value || config.nationalHolidayMessage;
+            config.nationalHolidayFooterMsg = document.getElementById('nationalHolidayFooterMsg')?.value || config.nationalHolidayFooterMsg;
+            config.showAnnouncement = document.getElementById('showAnnouncement')?.value === '1';
+            config.announcementText = document.getElementById('announcementText')?.value || config.announcementText;
+        }
+        
+        function updateBoard() {
+            const timeInfo = getCurrentTimeInfo();
+            const html = generateBoardHTML(timeInfo);
+            document.getElementById('previewBoard').innerHTML = html;
+            document.getElementById('fullscreenBoard').innerHTML = html;
         }
         
         function formatSubject(subject) {
             if (!subject) return '';
-            
-            if (subject === '朝HR') {
-                return '<span class="subject-char">朝</span><span class="subject-char">H</span><span class="subject-char">R</span>';
-            }
-            if (subject === 'HR' || subject === '終HR') {
-                return '<span class="subject-char">H</span><span class="subject-char" style="margin-top:20px">R</span>';
-            }
-            if (subject === 'LHR') {
-                return '<span class="subject-char">L</span><span class="subject-char">H</span><span class="subject-char">R</span>';
-            }
+            if (subject === '朝HR') return '<span class="subject-char">朝</span><span class="subject-char">H</span><span class="subject-char">R</span>';
+            if (subject === 'HR' || subject === '終HR') return '<span class="subject-char">H</span><span class="subject-char" style="margin-top:20px">R</span>';
+            if (subject === 'LHR') return '<span class="subject-char">L</span><span class="subject-char">H</span><span class="subject-char">R</span>';
             
             let result = '';
             if (subject.length <= 2) {
-                for (let char of subject) {
-                    result += `<span class="subject-char">${char}</span>`;
-                }
+                for (let c of subject) result += `<span class="subject-char">${c}</span>`;
             } else if (subject.length <= 4) {
-                for (let i = 0; i < subject.length; i += 2) {
-                    result += `<span class="subject-char">${subject.slice(i, i + 2)}</span>`;
-                }
+                for (let i = 0; i < subject.length; i += 2) result += `<span class="subject-char">${subject.slice(i, i+2)}</span>`;
             } else {
-                result += `<span class="subject-char">${subject.slice(0, 2)}</span>`;
-                result += `<span class="subject-char">${subject.slice(2, 4)}</span>`;
-                if (subject.length > 4) {
-                    result += `<span class="subject-char" style="font-size:18px">${subject.slice(4)}</span>`;
-                }
+                result += `<span class="subject-char">${subject.slice(0,2)}</span><span class="subject-char">${subject.slice(2,4)}</span>`;
+                if (subject.length > 4) result += `<span class="subject-char" style="font-size:18px">${subject.slice(4)}</span>`;
             }
             return result;
         }
         
-        // Save/Load
         function saveData() {
+            readConfigFromInputs();
             const dataStr = JSON.stringify(config, null, 2);
-            localStorage.setItem('scheduleConfigV2', dataStr);
-            
+            localStorage.setItem('scheduleConfigV6', dataStr);
             const blob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = 'schedule_config.json';
-            a.click();
+            a.href = url; a.download = 'schedule_config.json'; a.click();
             URL.revokeObjectURL(url);
-            
             alert('✅ 保存しました！');
         }
         
         function loadData() {
             const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
+            input.type = 'file'; input.accept = '.json';
             input.onchange = (e) => {
-                const file = e.target.files[0];
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     try {
                         config = JSON.parse(e.target.result);
                         applyConfig();
                         alert('✅ 読み込みました！');
-                    } catch (err) {
-                        alert('❌ 読み込みエラー');
-                    }
+                    } catch (err) { alert('❌ エラー'); }
                 };
-                reader.readAsText(file);
+                reader.readAsText(e.target.files[0]);
             };
             input.click();
         }
         
         function loadFromStorage() {
-            const saved = localStorage.getItem('scheduleConfigV2');
+            const saved = localStorage.getItem('scheduleConfigV6');
             if (saved) {
-                try {
-                    config = JSON.parse(saved);
-                    applyConfig();
-                } catch (err) {}
+                try { config = JSON.parse(saved); applyConfig(); } catch (err) {}
             }
         }
         
@@ -1214,17 +1678,27 @@
             document.getElementById('displayName').value = config.displayName || '普 通';
             document.getElementById('classNum').value = config.classNum || '3';
             document.getElementById('classUnit').value = config.classUnit || '組';
-            document.getElementById('scheduleType').value = config.scheduleType || '日課';
+            document.getElementById('breakMinutes').value = config.breakMinutes || 10;
             document.getElementById('footerMsg').value = config.footerMsg || '';
             document.getElementById('endTitle').value = config.endTitle || '本日終了';
             document.getElementById('endMessage').value = config.endMessage || '';
-            renderPeriodList();
+            document.getElementById('endFooterMsg').value = config.endFooterMsg || '';
+            document.getElementById('holidayTitle').value = config.holidayTitle || '長期休み中';
+            document.getElementById('holidayMessage').value = config.holidayMessage || '';
+            document.getElementById('holidayFooterMsg').value = config.holidayFooterMsg || '';
+            document.getElementById('autoNationalHoliday').value = config.autoNationalHoliday ? '1' : '0';
+            document.getElementById('nationalHolidayTitle').value = config.nationalHolidayTitle || '本日は祝日です';
+            document.getElementById('nationalHolidayMessage').value = config.nationalHolidayMessage || '';
+            document.getElementById('nationalHolidayFooterMsg').value = config.nationalHolidayFooterMsg || '';
+            document.getElementById('showAnnouncement').value = config.showAnnouncement ? '1' : '0';
+            document.getElementById('announcementText').value = config.announcementText || '';
+            renderAll();
             updateBoard();
         }
         
         function resetData() {
             if (confirm('⚠️ 全てリセットしますか？')) {
-                localStorage.removeItem('scheduleConfigV2');
+                localStorage.removeItem('scheduleConfigV6');
                 location.reload();
             }
         }
