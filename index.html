@@ -306,7 +306,17 @@
           if (!existing) {
             const li = document.createElement('li');
             li.id = 'u-' + id;
-            li.innerHTML = `<span>${name}</span><button class="kickBtn" data-id="${id}">退出</button>`;
+
+            const span = document.createElement('span');
+            span.textContent = name;
+            li.appendChild(span);
+
+            const kickButton = document.createElement('button');
+            kickButton.className = 'kickBtn';
+            kickButton.dataset.id = id;
+            kickButton.textContent = '退出';
+            li.appendChild(kickButton);
+
             partList.appendChild(li);
           }
         } else if (existing) {
@@ -323,8 +333,22 @@
         shown.add(id);
         const d = document.createElement('div');
         d.className = 'msg ' + (msg.name === userName ? 'self' : 'other');
-        d.innerHTML = `<span class="meta">${msg.name} ${new Date(msg.timestamp).toLocaleTimeString()}</span>${msg.text}
-          <button class="delBtn" data-id="${id}">削除</button>`;
+
+        const meta = document.createElement('span');
+        meta.className = 'meta';
+        meta.textContent = `${msg.name} ${new Date(msg.timestamp).toLocaleTimeString()}`;
+        d.appendChild(meta);
+
+        const textNode = document.createElement('span');
+        textNode.textContent = msg.text;
+        d.appendChild(textNode);
+
+        const delButton = document.createElement('button');
+        delButton.className = 'delBtn';
+        delButton.dataset.id = id;
+        delButton.textContent = '削除';
+        d.appendChild(delButton);
+
         chatArea.appendChild(d);
         chatArea.scrollTop = chatArea.scrollHeight;
       });
