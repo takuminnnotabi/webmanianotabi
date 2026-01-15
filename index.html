@@ -306,7 +306,14 @@
           if (!existing) {
             const li = document.createElement('li');
             li.id = 'u-' + id;
-            li.innerHTML = `<span>${name}</span><button class="kickBtn" data-id="${id}">退出</button>`;
+            const span = document.createElement('span');
+            span.textContent = name;
+            const btn = document.createElement('button');
+            btn.className = 'kickBtn';
+            btn.dataset.id = id;
+            btn.textContent = '退出';
+            li.appendChild(span);
+            li.appendChild(btn);
             partList.appendChild(li);
           }
         } else if (existing) {
@@ -323,8 +330,17 @@
         shown.add(id);
         const d = document.createElement('div');
         d.className = 'msg ' + (msg.name === userName ? 'self' : 'other');
-        d.innerHTML = `<span class="meta">${msg.name} ${new Date(msg.timestamp).toLocaleTimeString()}</span>${msg.text}
-          <button class="delBtn" data-id="${id}">削除</button>`;
+        const meta = document.createElement('span');
+        meta.className = 'meta';
+        meta.textContent = `${msg.name} ${new Date(msg.timestamp).toLocaleTimeString()}`;
+        const textNode = document.createTextNode(msg.text);
+        const del = document.createElement('button');
+        del.className = 'delBtn';
+        del.dataset.id = id;
+        del.textContent = '削除';
+        d.appendChild(meta);
+        d.appendChild(textNode);
+        d.appendChild(del);
         chatArea.appendChild(d);
         chatArea.scrollTop = chatArea.scrollHeight;
       });
